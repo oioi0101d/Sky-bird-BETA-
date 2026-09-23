@@ -2,84 +2,547 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sky Bird</title>
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0,
+maximum-scale=1.0, user-scalable=no">
+
+<title>SKY BIRD</title>
 
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    touch-action: manipulation;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    touch-action:manipulation;
 }
 
-html, body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #111;
-    font-family: Arial, sans-serif;
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#111;
+    font-family:Arial,sans-serif;
 }
 
-canvas {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    display: block;
+#game{
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100vh;
+    display:block;
+    background:#70c5ce;
 }
 
-#menu {
-    position: fixed;
-    inset: 0;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(#58c8e8, #b9f2ff);
+#menu{
+    position:fixed;
+    inset:0;
+    z-index:10;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(#58c8e8,#b9f2ff);
 }
 
-#menu h1 {
-    font-size: clamp(40px, 9vw, 80px);
-    color: white;
-    text-shadow: 4px 4px #333;
-    margin-bottom: 10px;
+#menu h1{
+    font-size:clamp(40px,9vw,80px);
+    color:white;
+    text-shadow:4px 4px #333;
+    margin-bottom:8px;
 }
 
-#menu p {
-    color: #333;
-    font-weight: bold;
-    margin-bottom: 15px;
+#menu p{
+    color:#333;
+    font-weight:bold;
+    margin-bottom:15px;
 }
 
-#skins {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    max-width: 900px;
-    padding: 10px;
+#skins{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:8px;
+    max-width:900px;
+    padding:10px;
 }
 
-.skin {
-    border: 3px solid white;
-    border-radius: 12px;
-    background: #222;
-    color: white;
-    padding: 10px 14px;
-    font-size: 18px;
+.skin{
+    min-width:125px;
+    border:3px solid white;
+    border-radius:12px;
+    background:#222;
+    color:white;
+    padding:10px 12px;
+    font-size:17px;
+    cursor:pointer;
 }
 
-.skin.locked {
-    opacity: 0.45;
+.skin.locked{
+    opacity:.45;
 }
 
-.skin.selected {
-    border-color: #ffe600;
-    box-shadow: 0 0 12px #ffe600;
+.skin.selected{
+    border-color:#ffe600;
+    box-shadow:0 0 15px #ffe600;
 }
 
-#start,
-#restart {
-    margin
+#start,#restart{
+    margin-top:12px;
+    padding:14px 45px;
+    border:0;
+    border-radius:15px;
+    background:#35b84a;
+    color:white;
+    font-size:25px;
+    font-weight:bold;
+}
+
+#score{
+    position:fixed;
+    top:15px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:5;
+    color:white;
+    font-size:clamp(35px,7vw,65px);
+    font-weight:bold;
+    text-shadow:4px 4px #333;
+    display:none;
+}
+
+#gameOver{
+    position:fixed;
+    inset:0;
+    z-index:20;
+    display:none;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    background:rgba(0,0,0,.55);
+    color:white;
+}
+
+#gameOver h2{
+    font-size:55px;
+    text-shadow:4px 4px #000;
+}
+
+#gameOver p{
+    font-size:25px;
+    margin:10px;
+}
+
+#restart{
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="game"></canvas>
+
+<div id="score">0</div>
+
+<div id="menu">
+
+    <h1>🐦 SKY BIRD</h1>
+
+    <p>Escolha seu pássaro</p>
+
+    <div id="skins"></div>
+
+    <button id="start">JOGAR</button>
+
+</div>
+
+<div id="gameOver">
+
+    <h2>GAME OVER</h2>
+
+    <p>
+        Pontuação:
+        <span id="finalScore">0</span>
+    </p>
+
+    <p>
+        Recorde:
+        <span id="bestFinal">0</span>
+    </p>
+
+    <button id="restart">JOGAR NOVAMENTE</button>
+
+</div>
+
+<script>
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const menu = document.getElementById("menu");
+const skinsBox = document.getElementById("skins");
+const startButton = document.getElementById("start");
+
+const scoreText = document.getElementById("score");
+const gameOver = document.getElementById("gameOver");
+const finalScore = document.getElementById("finalScore");
+const bestFinal = document.getElementById("bestFinal");
+const restartButton = document.getElementById("restart");
+
+
+/* =========================
+   SKINS
+========================= */
+
+const skins = [
+
+    {
+        name:"🐦 Comum",
+        unlock:0,
+        color:"#ffd21f"
+    },
+
+    {
+        name:"🦸 Herói",
+        unlock:100,
+        color:"#2878ff"
+    },
+
+    {
+        name:"🔥 Fênix",
+        unlock:300,
+        color:"#ff4b16"
+    },
+
+    {
+        name:"🤖 Robô",
+        unlock:500,
+        color:"#9da5ad"
+    },
+
+    {
+        name:"👽 Alien",
+        unlock:1000,
+        color:"#65ff50"
+    },
+
+    {
+        name:"🌑 Sombrio",
+        unlock:2000,
+        color:"#292333"
+    }
+
+];
+
+let bestScore =
+    Number(localStorage.getItem("skyBest") || 0);
+
+let selectedSkin =
+    Number(localStorage.getItem("skySkin") || 0);
+
+if(
+    selectedSkin < 0 ||
+    selectedSkin >= skins.length
+){
+    selectedSkin = 0;
+}
+
+
+/* =========================
+   TAMANHO
+========================= */
+
+let W = 0;
+let H = 0;
+
+function resize(){
+
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+
+}
+
+resize();
+
+window.addEventListener("resize",resize);
+
+
+/* =========================
+   MENU DAS SKINS
+========================= */
+
+function createSkins(){
+
+    skinsBox.innerHTML = "";
+
+    for(let i=0;i<skins.length;i++){
+
+        const skin = skins[i];
+
+        const unlocked =
+            bestScore >= skin.unlock;
+
+        const button =
+            document.createElement("button");
+
+        button.className = "skin";
+
+        if(!unlocked){
+            button.classList.add("locked");
+        }
+
+        if(i === selectedSkin){
+            button.classList.add("selected");
+        }
+
+        if(unlocked){
+
+            button.textContent =
+                skin.name +
+                (skin.unlock > 0
+                ? " ✓"
+                : "");
+
+            button.onclick = function(){
+
+                selectedSkin = i;
+
+                localStorage.setItem(
+                    "skySkin",
+                    selectedSkin
+                );
+
+                createSkins();
+
+            };
+
+        }else{
+
+            button.textContent =
+                skin.name +
+                " 🔒 " +
+                skin.unlock;
+
+        }
+
+        skinsBox.appendChild(button);
+    }
+}
+
+createSkins();
+
+
+/* =========================
+   JOGO
+========================= */
+
+let bird = {
+    x:0,
+    y:0,
+    velocity:0,
+    size:26
+};
+
+let pipes = [];
+
+let score = 0;
+
+let playing = false;
+
+let lastTime = 0;
+
+let pipeTimer = 0;
+
+
+/*
+    FÍSICA
+
+    A gravidade é aplicada por segundo,
+    então a velocidade não depende tanto
+    do FPS do celular.
+*/
+
+const GRAVITY = 1150;
+
+const JUMP_FORCE = -390;
+
+
+/* =========================
+   RESET
+========================= */
+
+function resetGame(){
+
+    bird.x = W * 0.25;
+
+    bird.y = H * 0.45;
+
+    bird.velocity = 0;
+
+    bird.size =
+        Math.max(
+            22,
+            Math.min(W,H) * 0.055
+        );
+
+    pipes = [];
+
+    score = 0;
+
+    pipeTimer = 0;
+
+    scoreText.textContent = "0";
+
+}
+
+
+/* =========================
+   COMEÇAR
+========================= */
+
+function startGame(){
+
+    resetGame();
+
+    menu.style.display = "none";
+
+    gameOver.style.display = "none";
+
+    scoreText.style.display = "block";
+
+    playing = true;
+
+    lastTime = performance.now();
+
+    requestAnimationFrame(gameLoop);
+
+}
+
+
+/* =========================
+   PULO
+========================= */
+
+function flap(){
+
+    if(!playing) return;
+
+    bird.velocity = JUMP_FORCE;
+
+}
+
+
+/* =========================
+   CONTROLE
+========================= */
+
+canvas.addEventListener(
+    "pointerdown",
+    function(e){
+
+        e.preventDefault();
+
+        flap();
+
+    }
+);
+
+document.addEventListener(
+    "keydown",
+    function(e){
+
+        if(
+            e.code === "Space" ||
+            e.code === "ArrowUp"
+        ){
+
+            e.preventDefault();
+
+            flap();
+
+        }
+
+    }
+);
+
+startButton.onclick = startGame;
+
+restartButton.onclick = startGame;
+
+
+/* =========================
+   CANOS
+========================= */
+
+function createPipe(){
+
+    const gap =
+        Math.max(
+            145,
+            H * 0.25
+        );
+
+    const minTop = 50;
+
+    const minBottom = 50;
+
+    const available =
+        H - gap -
+        minTop -
+        minBottom;
+
+    const top =
+        minTop +
+        Math.random() * available;
+
+    pipes.push({
+
+        x:W + 50,
+
+        width:
+            Math.max(
+                55,
+                W * 0.075
+            ),
+
+        top:top,
+
+        gap:gap,
+
+        passed:false
+
+    });
+
+}
+
+
+/* =========================
+   ATUALIZAR
+========================= */
+
+function update(delta){
+
+    /*
+       Limita o delta para evitar
+       bugs quando o celular trava.
+    */
+
+    delta =
+        Math.min(delta,0.035);
+
+
+    /* GRAVIDADE */
+
+    bird.velocity +=
+        GRAVITY * delta;
+
+    bird.y +=
+        bird.velocity * delta;
+
+
+    /* CANOS */
+
+    const pipeSpeed =
+        Math.max(
+            180
