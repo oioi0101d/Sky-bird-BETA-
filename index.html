@@ -274,4 +274,945 @@ window.addEventListener(
 
 
 /* =========================
-   MENU
+   MENU DE SKINS
+========================= */
+
+function drawSkins() {
+
+    const box =
+        document.getElementById("skins");
+
+    box.innerHTML = "";
+
+    skins.forEach((skin, i) => {
+
+        const button =
+            document.createElement("button");
+
+        const unlocked =
+            bestScore >= skin.unlock;
+
+        button.className =
+            "skin " +
+            (!unlocked ? "locked " : "") +
+            (selectedSkin === i
+                ? "selected"
+                : "");
+
+        if (unlocked) {
+
+            button.textContent =
+                skin.name;
+
+        } else {
+
+            button.textContent =
+                skin.name +
+                " 🔒 " +
+                skin.unlock;
+
+        }
+
+        button.onclick = () => {
+
+            if (!unlocked)
+                return;
+
+            selectedSkin = i;
+
+            localStorage.setItem(
+                "skySkin",
+                i
+            );
+
+            drawSkins();
+        };
+
+        box.appendChild(button);
+
+    });
+}
+
+drawSkins();
+
+
+/* =========================
+   VARIÁVEIS DO JOGO
+========================= */
+
+let bird;
+let pipes;
+
+let score = 0;
+
+let playing = false;
+
+let lastTime = 0;
+
+let pipeTimer = 0;
+
+
+/* =========================
+   INICIAR
+========================= */
+
+function startGame() {
+
+    menu.style.display = "none";
+
+    gameOver.style.display = "none";
+
+    scoreText.style.display = "block";
+
+    bird = {
+
+        x: W * 0.22,
+
+        y: H * 0.5,
+
+        r: Math.max(
+            18,
+            H * 0.035
+        ),
+
+        velocity: 0
+
+    };
+
+    pipes = [];
+
+    score = 0;
+
+    pipeTimer = 0;
+
+    playing = true;
+
+    scoreText.textContent = "0";
+
+    lastTime =
+        performance.now();
+
+    requestAnimationFrame(loop);
+
+}
+
+
+/* =========================
+   PULO
+========================= */
+
+function flap() {
+
+    if (!playing)
+        return;
+
+    bird.velocity =
+        -H * 0.009;
+}
+
+
+/* TOQUE NA TELA */
+
+canvas.addEventListener(
+    "pointerdown",
+    flap
+);
+
+
+/* TECLADO */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.code === "Space" ||
+            event.code === "ArrowUp"
+        ) {
+
+            flap();
+
+        }
+
+    }
+);
+
+
+/* BOTÕES */
+
+document.getElementById(
+    "start"
+).onclick = startGame;
+
+document.getElementById(
+    "restart"
+).onclick = startGame;
+
+
+/* =========================
+   CANOS
+========================= */
+
+function createPipe() {
+
+    const gap =
+        Math.max(
+            145,
+            H * 0.30
+        );
+
+    const minTop = 50;
+
+    const maxTop =
+        H - gap - 80;
+
+    const top =
+        minTop +
+        Math.random() *
+        Math.max(
+            1,
+            maxTop - minTop
+        );
+
+    pipes.push({
+
+        x: W + 50,
+
+        width:
+            Math.max(
+                55,
+                W * 0.06
+            ),
+
+        top: top,
+
+        gap: gap,
+
+        passed: false
+
+    });
+
+}
+
+
+/* =========================
+   ATUALIZAÇÃO
+========================= */
+
+function update(dt) {
+
+    /* gravidade */
+
+    bird.velocity +=
+        H * 0.000028 * dt;
+
+    bird.y +=
+        bird.velocity * dt;
+
+
+    /* criar canos */
+
+    pipeTimer += dt;
+
+    if (pipeTimer > 1500) {
+
+        createPipe();
+
+        pipeTimer = 0;
+
+    }
+
+
+    /* velocidade */
+
+    const speed =
+        W * 0.00038 * dt;
+
+
+    /* mover canos */
+
+    for (
+        let i = pipes.length - 1;
+        i >= 0;
+        i--
+    ) {
+
+        const p = pipes[i];
+
+        p.x -= speed;
+
+
+        /* ponto */
+
+        if (
+            !p.passed &&
+            p.x + p.width < bird.x
+        ) {
+
+            p.passed = true;
+
+            score++;
+
+            scoreText.textContent =
+                score;
+
+
+            if (
+                score > bestScore
+            ) {
+
+                bestScore = score;
+
+                localStorage.setItem(
+                    "skyBest",
+                    bestScore
+                );
+
+            }
+
+        }
+
+
+        /* remover */
+
+        if (
+            p.x + p.width < 0
+        ) {
+
+            pipes.splice(i, 1);
+
+        }
+
+    }
+
+
+    /* teto / chão */
+
+    if (
+
+        bird.y - bird.r < 0 ||
+
+        bird.y + bird.r > H
+
+    ) {
+
+        endGame();
+
+    }
+
+
+    /* colisão */
+
+    for (const p of pipes) {
+
+        const hitX =
+
+            bird.x + bird.r > p.x &&
+
+            bird.x - bird.r <
+            p.x + p.width;
+
+
+        const hitY =
+
+            bird.y - bird.r < p.top ||
+
+            bird.y + bird.r >
+            p.top + p.gap;
+
+
+        if (
+            hitX &&
+            hitY
+        ) {
+
+            endGame();
+
+        }
+
+    }
+
+}
+
+
+/* =========================
+   FUNDO
+========================= */
+
+function drawBackground() {
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            0,
+            H
+        );
+
+    gradient.addColorStop(
+        0,
+        "#55c7e5"
+    );
+
+    gradient.addColorStop(
+        1,
+        "#d7f7ff"
+    );
+
+    ctx.fillStyle = gradient;
+
+    ctx.fillRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    /* nuvens */
+
+    ctx.fillStyle =
+        "rgba(255,255,255,.8)";
+
+
+    for (
+        let i = 0;
+        i < 5;
+        i++
+    ) {
+
+        const x =
+            (i * 230 + 100)
+            % (W + 200)
+            - 100;
+
+        const y =
+            70 +
+            (i % 3) * 80;
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            30,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.arc(
+            x + 35,
+            y - 10,
+            40,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.arc(
+            x + 75,
+            y,
+            30,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    /* chão */
+
+    ctx.fillStyle =
+        "#6ac34a";
+
+    ctx.fillRect(
+        0,
+        H - 35,
+        W,
+        35
+    );
+
+
+    ctx.fillStyle =
+        "#4b9c35";
+
+    ctx.fillRect(
+        0,
+        H - 35,
+        W,
+        6
+    );
+
+}
+
+
+/* =========================
+   CANOS
+========================= */
+
+function drawPipes() {
+
+    for (const p of pipes) {
+
+        ctx.fillStyle =
+            "#35a832";
+
+
+        /* cano de cima */
+
+        ctx.fillRect(
+            p.x,
+            0,
+            p.width,
+            p.top
+        );
+
+
+        /* cano de baixo */
+
+        ctx.fillRect(
+            p.x,
+            p.top + p.gap,
+            p.width,
+            H
+        );
+
+
+        ctx.fillStyle =
+            "#258326";
+
+
+        /* tampa superior */
+
+        ctx.fillRect(
+            p.x - 7,
+            p.top - 18,
+            p.width + 14,
+            18
+        );
+
+
+        /* tampa inferior */
+
+        ctx.fillRect(
+            p.x - 7,
+            p.top + p.gap,
+            p.width + 14,
+            18
+        );
+
+    }
+
+}
+
+
+/* =========================
+   PÁSSARO
+========================= */
+
+function drawBird() {
+
+    const skin =
+        skins[selectedSkin];
+
+
+    ctx.save();
+
+
+    ctx.translate(
+        bird.x,
+        bird.y
+    );
+
+
+    const angle =
+        Math.max(
+            -0.5,
+            Math.min(
+                0.7,
+                bird.velocity / 10
+            )
+        );
+
+
+    ctx.rotate(angle);
+
+
+    /* corpo */
+
+    ctx.fillStyle =
+        skin.color;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        0,
+        0,
+        bird.r,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    /* olho */
+
+    ctx.fillStyle =
+        "white";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        bird.r * 0.35,
+        -bird.r * 0.35,
+        bird.r * 0.35,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    ctx.fillStyle =
+        "black";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        bird.r * 0.45,
+        -bird.r * 0.35,
+        bird.r * 0.12,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    /* bico */
+
+    ctx.fillStyle =
+        "#ff8c00";
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        bird.r * 0.8,
+        0
+    );
+
+    ctx.lineTo(
+        bird.r * 1.5,
+        bird.r * 0.25
+    );
+
+    ctx.lineTo(
+        bird.r * 0.8,
+        bird.r * 0.45
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    /* =================
+       HERÓI
+    ================= */
+
+    if (selectedSkin === 1) {
+
+        ctx.fillStyle =
+            "#e52d2d";
+
+        ctx.fillRect(
+            -bird.r * 0.8,
+            bird.r * 0.1,
+            bird.r * 1.2,
+            bird.r * 0.3
+        );
+
+    }
+
+
+    /* =================
+       FÊNIX
+    ================= */
+
+    if (selectedSkin === 2) {
+
+        ctx.fillStyle =
+            "#ff9d00";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -bird.r,
+            0
+        );
+
+        ctx.lineTo(
+            -bird.r * 1.8,
+            -bird.r * 0.8
+        );
+
+        ctx.lineTo(
+            -bird.r * 1.4,
+            0
+        );
+
+        ctx.lineTo(
+            -bird.r * 1.8,
+            bird.r * 0.8
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+    }
+
+
+    /* =================
+       ROBÔ
+    ================= */
+
+    if (selectedSkin === 3) {
+
+        ctx.strokeStyle =
+            "#222";
+
+        ctx.lineWidth = 3;
+
+        ctx.strokeRect(
+            -bird.r * .65,
+            -bird.r * .65,
+            bird.r * 1.3,
+            bird.r * 1.3
+        );
+
+
+        ctx.fillStyle =
+            "#00ffff";
+
+        ctx.fillRect(
+            -bird.r * .2,
+            bird.r * .45,
+            bird.r * .4,
+            bird.r * .12
+        );
+
+    }
+
+
+    /* =================
+       ALIEN
+    ================= */
+
+    if (selectedSkin === 4) {
+
+        ctx.fillStyle =
+            "#9aff75";
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            0,
+            -bird.r * .2,
+            bird.r * .75,
+            bird.r * .95,
+            0,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        ctx.fillStyle =
+            "black";
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            -bird.r * .3,
+            -bird.r * .35,
+            bird.r * .15,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.arc(
+            bird.r * .3,
+            -bird.r * .35,
+            bird.r * .15,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    /* =================
+       SOMBRIO
+    ================= */
+
+    if (selectedSkin === 5) {
+
+        ctx.fillStyle =
+            "#5e477d";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -bird.r * .4,
+            -bird.r
+        );
+
+        ctx.lineTo(
+            -bird.r * 1.3,
+            -bird.r * .3
+        );
+
+        ctx.lineTo(
+            -bird.r * .5,
+            -bird.r * .2
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+    }
+
+
+    ctx.restore();
+
+}
+
+
+/* =========================
+   DESENHAR
+========================= */
+
+function draw() {
+
+    drawBackground();
+
+    drawPipes();
+
+    drawBird();
+
+}
+
+
+/* =========================
+   LOOP
+========================= */
+
+function loop(time) {
+
+    if (!playing)
+        return;
+
+
+    const dt =
+        Math.min(
+            40,
+            time - lastTime
+        );
+
+
+    lastTime = time;
+
+
+    update(dt);
+
+    draw();
+
+
+    requestAnimationFrame(
+        loop
+    );
+
+}
+
+
+/* =========================
+   GAME OVER
+========================= */
+
+function endGame() {
+
+    if (!playing)
+        return;
+
+
+    playing = false;
+
+
+    finalScore.textContent =
+        score;
+
+
+    scoreText.style.display =
+        "none";
+
+
+    gameOver.style.display =
+        "flex";
+
+
+    drawSkins();
+
+}
+
+
+/* =========================
+   TELA DEITADA
+========================= */
+
+async function landscape() {
+
+    try {
+
+        if (
+            screen.orientation &&
+            screen.orientation.lock
+        ) {
+
+            await screen.orientation.lock(
+                "landscape"
+            );
+
+        }
+
+    } catch (e) {
+
+        /*
+        Alguns celulares/navegadores
+        não permitem travar a tela.
+        */
+
+    }
+
+}
+
+
+document.getElementById(
+    "start"
+).addEventListener(
+    "click",
+    landscape
+);
+
+</script>
+
+</body>
+</html>
