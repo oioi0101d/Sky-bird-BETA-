@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sky Bird</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    background: #65c9ff;
+}
+
+#game {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(
+        #55c7ff,
+        #a9e7ff,
+        #eafaff
+    );
+}
+
+/* ☀️ SOL */
+
+#sun {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+
+    right: 40px;
+    top: 40px;
+
+    background: #ffd83d;
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 40px #fff176;
+}
+
+/* 🐦 PÁSSARO */
+
+#bird {
+    position: absolute;
+
+    left: 100px;
+    top: 40%;
+
+    font-size: 60px;
+
+    z-index: 10;
+
+    transition: transform 0.1s;
+}
+
+/* ☁️ NUVENS */
+
+.cloud {
+    position: absolute;
+
+    width: 130px;
+    height: 45px;
+
+    background: white;
+
+    border-radius: 50px;
+
+    box-shadow:
+        0 5px 15px rgba(0,0,0,0.12);
+}
+
+.cloud::before {
+    content: "";
+
+    position: absolute;
+
+    width: 60px;
+    height: 60px;
+
+    left: 20px;
+    top: -25px;
+
+    background: white;
+
+    border-radius: 50%;
+}
+
+.cloud::after {
+    content: "";
+
+    position: absolute;
+
+    width: 70px;
+    height: 70px;
+
+    right: 15px;
+    top: -30px;
+
+    background: white;
+
+    border-radius: 50%;
+}
+
+/* 🪙 MOEDA */
+
+.coin {
+    position: absolute;
+
+    font-size: 32px;
+
+    z-index: 4;
+}
+
+/* 📊 PLACAR */
+
+#score {
+    position: absolute;
+
+    left: 15px;
+    top: 15px;
+
+    padding: 10px 15px;
+
+    background: rgba(255,255,255,0.85);
+
+    border-radius: 12px;
+
+    font-size: 20px;
+    font-weight: bold;
+
+    z-index: 20;
+}
+
+/* 🪙 MOEDAS */
+
+#coins {
+    position: absolute;
+
+    left: 15px;
+    top: 65px;
+
+    padding: 8px 13px;
+
+    background: rgba(255,255,255,0.85);
+
+    border-radius: 12px;
+
+    font-size: 18px;
+    font-weight: bold;
+
+    z-index: 20;
+}
+
+/* 🏠 MENU */
+
+#menu {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-direction: column;
+
+    background: rgba(255,255,255,0.25);
+
+    z-index: 30;
+}
+
+#menu h1 {
+    font-size: 55px;
+
+    margin: 0 0 10px;
+
+    text-shadow:
+        3px 3px white;
+}
+
+#menu p {
+    font-size: 20px;
+}
+
+button {
+    border: none;
+
+    padding: 15px 30px;
+
+    border-radius: 15px;
+
+    background: #ffd83d;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 0 #d3a900;
+}
+
+button:active {
+    transform: translateY(4px);
+
+    box-shadow:
+        0 1px 0 #d3a900;
+}
+
+/* ☠️ GAME OVER */
+
+#gameOver {
+    position: absolute;
+
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-direction: column;
+
+    background: rgba(0,0,0,0.45);
+
+    color: white;
+
+    z-index: 40;
+}
+
+#gameOver h2 {
+    font-size: 50px;
+
+    margin: 0;
+}
+
+#gameOver p {
+    font-size: 24px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <div id="sun"></div>
+
+    <div id="score">
+        Distância: 0
+    </div>
+
+    <div id="coins">
+        🪙 0
+    </div>
+
+    <div id="bird">
+        🐦
+    </div>
+
+    <div id="menu">
+
+        <h1>🐦 SKY BIRD</h1>
+
+        <p>Toque na tela para voar!</p>
+
+        <button id="startButton">
+            JOGAR
+        </button>
+
+    </div>
+
+    <div id="gameOver">
+
+        <h2>GAME OVER</h2>
+
+        <p id="finalScore">
+            Distância: 0
+        </p>
+
+        <button id="restartButton">
+            JOGAR NOVAMENTE
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =========================
+   SKY BIRD
+   ========================= */
+
+const game =
+    document.getElementById("game");
+
+const bird =
+    document.getElementById("bird");
+
+const scoreText =
+    document.getElementById("score");
+
+const coinsText =
+    document.getElementById("coins");
+
+const menu =
+    document.getElementById("menu");
+
+const gameOver =
+    document.getElementById("gameOver");
+
+const finalScore =
+    document.getElementById("finalScore");
+
+const startButton =
+    document.getElementById("startButton");
+
+const restartButton =
+    document.getElementById("restartButton");
+
+
+/* =========================
+   VARIÁVEIS
+   ========================= */
+
+let birdY = 300;
+
+let velocity = 0;
+
+let gravity = 0.45;
+
+let jumpPower = -9;
+
+let score = 0;
+
+let coins = 0;
+
+let playing = false;
+
+let clouds = [];
+
+let coinObjects = [];
+
+let lastCloud = 0;
+
+let lastCoin = 0;
+
+
+/* =========================
+   VOAR
+   ========================= */
+
+function flap() {
+
+    if (!playing)
+        return;
+
+    velocity = jumpPower;
+
+    bird.style.transform =
+        "rotate(-15deg)";
+}
+
+
+/* =========================
+   CONTROLE
+   ========================= */
+
+game.addEventListener(
+    "pointerdown",
+    function(event) {
+
+        if (
+            event.target.tagName ===
+            "BUTTON"
+        ) {
+            return;
+        }
+
+        flap();
+    }
+);
+
+
+/* =========================
+   TECLADO
+   ========================= */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.code === "Space"
+        ) {
+
+            event.preventDefault();
+
+            flap();
+        }
+
+    }
+);
+
+
+/* =========================
+   CRIAR NUVEM
+   ========================= */
+
+function createCloud() {
+
+    const cloud =
+        document.createElement("div");
+
+    cloud.className = "cloud";
+
+    let y =
+        Math.random() *
+        (window.innerHeight - 180);
+
+    y = Math.max(80, y);
+
+    cloud.style.left =
+        window.innerWidth + "px";
+
+    cloud.style.top =
+        y + "px";
+
+    game.appendChild(cloud);
+
+    clouds.push({
+
+        element: cloud,
+
+        x: window.innerWidth,
+
+        y: y
+
+    });
+}
+
+
+/* =========================
+   CRIAR MOEDA
+   ========================= */
+
+function createCoin() {
+
+    const coin =
+        document.createElement("div");
+
+    coin.className = "coin";
+
+    coin.textContent = "🪙";
+
+    let y =
+        Math.random() *
+        (window.innerHeight - 150);
+
+    y = Math.max(70, y);
+
+    coin.style.left =
+        window.innerWidth + "px";
+
+    coin.style.top =
+        y + "px";
+
+    game.appendChild(coin);
+
+    coinObjects.push({
+
+        element: coin,
+
+        x: window.innerWidth,
+
+        y: y
+
+    });
+}
+
+
+/* =========================
+   COLISÃO
+   ========================= */
+
+function collision(a, b) {
+
+    const r1 =
+        a.getBoundingClientRect();
+
+    const r2 =
+        b.getBoundingClientRect();
+
+    return !(
+        r1.right < r2.left ||
+        r1.left > r2.right ||
+        r1.bottom < r2.top ||
+        r1.top > r2.bottom
+    );
+}
+
+
+/* =========================
+   COMEÇAR
+   ========================= */
+
+function startGame() {
+
+    clouds.forEach(
+        c => c.element.remove()
+    );
+
+    coinObjects.forEach(
+        c => c.element.remove()
+    );
+
+    clouds = [];
+
+    coinObjects = [];
+
+    birdY =
+        window.innerHeight * 0.4;
+
+    velocity = 0;
+
+    score = 0;
+
+    coins = 0;
+
+    playing = true;
+
+    menu.style.display = "none";
+
+    gameOver.style.display = "none";
+
+}
+
+
+/* =========================
+   GAME OVER
+   ========================= */
+
+function endGame() {
+
+    playing = false;
+
+    finalScore.textContent =
+        "Distância: " +
+        Math.floor(score) +
+        " | 🪙 " +
+        coins;
+
+    gameOver.style.display =
+        "flex";
+}
+
+
+/* =========================
+   BOTÕES
+   ========================= */
+
+startButton.addEventListener(
+    "click",
+    startGame
+);
+
+restartButton.addEventListener(
+    "click",
+    startGame
+);
+
+
+/* =========================
+   LOOP DO JOGO
+   ========================= */
+
+function gameLoop(time) {
+
+    if (playing) {
+
+        /* FÍSICA */
+
+        velocity += gravity;
+
+        birdY += velocity;
+
+        bird.style.top =
+            birdY + "px";
+
+        bird.style.transform =
+            velocity < 0
+            ? "rotate(-15deg)"
+            : "rotate(15deg)";
+
+
+        /* PONTUAÇÃO */
+
+        score += 0.05;
+
+        scoreText.textContent =
+            "Distância: " +
+            Math.floor(score);
+
+        coinsText.textContent =
+            "🪙 " + coins;
+
+
+        /* NUVENS */
+
+        if (
+            time - lastCloud > 1200
+        ) {
+
+            createCloud();
+
+            lastCloud = time;
+        }
+
+
+        /* MOEDAS */
+
+        if (
+            time - lastCoin > 1800
+        ) {
+
+            createCoin();
+
+            lastCoin = time;
+        }
+
+
+        /* MOVER NUVENS */
+
+        clouds.forEach(
+            (cloud, index) => {
+
+                cloud.x -= 4;
+
+                cloud.element.style.left =
+                    cloud.x + "px";
+
+
+                if (
+                    collision(
+                        bird,
+                        cloud.element
+                    )
+                ) {
+
+                    endGame();
+                }
+
+
+                if (
+                    cloud.x < -200
+                ) {
+
+                    cloud.element.remove();
+
+                    clouds.splice(
+                        index,
+                        1
+                    );
+                }
+
+            }
+        );
+
+
+        /* MOVER MOEDAS */
+
+        coinObjects.forEach(
+            (coin, index) => {
+
+                coin.x -= 4;
+
+                coin.element.style.left =
+                    coin.x + "px";
+
+
+                if (
+                    collision(
+                        bird,
+                        coin.element
+                    )
+                ) {
+
+                    coins++;
+
+                    coin.element.remove();
+
+                    coinObjects.splice(
+                        index,
+                        1
+                    );
+                }
+
+
+                if (
+                    coin.x < -100
+                ) {
+
+                    coin.element.remove();
+
+                    coinObjects.splice(
+                        index,
+                        1
+                    );
+                }
+
+            }
+        );
+
+
+        /* CAIR */
+
+        if (
+            birdY < -100 ||
+            birdY >
+            window.innerHeight
+        ) {
+
+            endGame();
+        }
+
+    }
+
+
+    requestAnimationFrame(
+        gameLoop
+    );
+}
+
+
+/* =========================
+   INICIAR LOOP
+   ========================= */
+
+requestAnimationFrame(
+    gameLoop
+);
+
+</script>
+
+</body>
+  </html>
