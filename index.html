@@ -2,10 +2,14 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+
 <meta name="viewport"
-      content="width=device-width, initial-scale=1.0,
-               maximum-scale=1.0, user-scalable=no">
-<title>Sly Bird Beta</title>
+      content="width=device-width,
+      initial-scale=1.0,
+      maximum-scale=1.0,
+      user-scalable=no">
+
+<title>Sky Bird</title>
 
 <style>
 * {
@@ -36,10 +40,12 @@ html, body {
     position: fixed;
     inset: 0;
     z-index: 10;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
     background: linear-gradient(#58c8e8, #b9f2ff);
 }
 
@@ -89,8 +95,10 @@ html, body {
     padding: 14px 45px;
     border: 0;
     border-radius: 15px;
+
     background: #35b84a;
     color: white;
+
     font-size: 25px;
     font-weight: bold;
 }
@@ -100,22 +108,30 @@ html, body {
     top: 15px;
     left: 50%;
     transform: translateX(-50%);
+
     z-index: 5;
+
     color: white;
     font-size: clamp(35px, 7vw, 65px);
     font-weight: bold;
+
     text-shadow: 4px 4px #333;
+
     display: none;
 }
 
 #gameOver {
     position: fixed;
     inset: 0;
+
     z-index: 20;
+
     display: none;
+
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
     background: rgba(0,0,0,.55);
     color: white;
 }
@@ -134,8 +150,10 @@ html, body {
     padding: 13px 35px;
     border: 0;
     border-radius: 12px;
+
     background: #35b84a;
     color: white;
+
     font-size: 22px;
     font-weight: bold;
 }
@@ -148,22 +166,39 @@ html, body {
 
 <div id="score">0</div>
 
+<!-- MENU -->
 <div id="menu">
-    <h1>🐦 SLY BIRD</h1>
+
+    <h1>🐦 SKY BIRD</h1>
+
     <p>Escolha seu pássaro</p>
 
     <div id="skins"></div>
 
-    <button id="start">JOGAR</button>
+    <button id="start">
+        JOGAR
+    </button>
+
 </div>
 
+<!-- GAME OVER -->
 <div id="gameOver">
+
     <h2>GAME OVER</h2>
-    <p>Pontuação: <span id="finalScore">0</span></p>
-    <button id="restart">JOGAR NOVAMENTE</button>
+
+    <p>
+        Pontuação:
+        <span id="finalScore">0</span>
+    </p>
+
+    <button id="restart">
+        JOGAR NOVAMENTE
+    </button>
+
 </div>
 
 <script>
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -173,467 +208,70 @@ const gameOver = document.getElementById("gameOver");
 const finalScore = document.getElementById("finalScore");
 
 const skins = [
-    {name:"🐦 Comum", unlock:0, color:"#ffd21f"},
-    {name:"🦸 Herói", unlock:100, color:"#2878ff"},
-    {name:"🔥 Fênix", unlock:300, color:"#ff4b16"},
-    {name:"🤖 Robô", unlock:500, color:"#9da5ad"},
-    {name:"👽 Alien", unlock:1000, color:"#65ff50"},
-    {name:"🌑 Sombrio", unlock:2000, color:"#292333"}
+
+    {
+        name: "🐦 Comum",
+        unlock: 0,
+        color: "#ffd21f"
+    },
+
+    {
+        name: "🦸 Herói",
+        unlock: 100,
+        color: "#2878ff"
+    },
+
+    {
+        name: "🔥 Fênix",
+        unlock: 300,
+        color: "#ff4b16"
+    },
+
+    {
+        name: "🤖 Robô",
+        unlock: 500,
+        color: "#9da5ad"
+    },
+
+    {
+        name: "👽 Alien",
+        unlock: 1000,
+        color: "#65ff50"
+    },
+
+    {
+        name: "🌑 Sombrio",
+        unlock: 2000,
+        color: "#292333"
+    }
+
 ];
 
-let bestScore = Number(localStorage.getItem("slyBest") || 0);
-let selectedSkin = Number(localStorage.getItem("slySkin") || 0);
+let bestScore =
+    Number(localStorage.getItem("skyBest") || 0);
 
-let W, H;
+let selectedSkin =
+    Number(localStorage.getItem("skySkin") || 0);
+
+let W;
+let H;
 
 function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
+
+    W = canvas.width =
+        window.innerWidth;
+
+    H = canvas.height =
+        window.innerHeight;
 }
 
 resize();
-window.addEventListener("resize", resize);
 
-function drawSkins() {
-    const box = document.getElementById("skins");
-    box.innerHTML = "";
+window.addEventListener(
+    "resize",
+    resize
+);
 
-    skins.forEach((skin, i) => {
-        const button = document.createElement("button");
 
-        const unlocked = bestScore >= skin.unlock;
-
-        button.className =
-            "skin " +
-            (!unlocked ? "locked " : "") +
-            (selectedSkin === i ? "selected" : "");
-
-        button.textContent =
-            unlocked
-            ? skin.name
-            : skin.name + " 🔒 " + skin.unlock;
-
-        button.onclick = () => {
-            if (!unlocked) return;
-
-            selectedSkin = i;
-            localStorage.setItem("slySkin", i);
-            drawSkins();
-        };
-
-        box.appendChild(button);
-    });
-}
-
-drawSkins();
-
-let bird;
-let pipes;
-let score;
-let playing;
-let lastTime = 0;
-let pipeTimer = 0;
-
-function startGame() {
-
-    menu.style.display = "none";
-    gameOver.style.display = "none";
-    scoreText.style.display = "block";
-
-    bird = {
-        x: W * 0.22,
-        y: H * 0.5,
-        r: Math.max(18, H * 0.035),
-        velocity: 0
-    };
-
-    pipes = [];
-    score = 0;
-    pipeTimer = 0;
-    playing = true;
-
-    scoreText.textContent = "0";
-
-    lastTime = performance.now();
-    requestAnimationFrame(loop);
-}
-
-function flap() {
-    if (!playing) return;
-
-    bird.velocity = -H * 0.009;
-}
-
-canvas.addEventListener("pointerdown", flap);
-
-document.addEventListener("keydown", e => {
-    if (e.code === "Space" || e.code === "ArrowUp") {
-        flap();
-    }
-});
-
-document.getElementById("start").onclick = startGame;
-document.getElementById("restart").onclick = startGame;
-
-function createPipe() {
-
-    const gap = Math.max(145, H * 0.30);
-
-    const minTop = 50;
-    const maxTop = H - gap - 80;
-
-    const top = minTop +
-        Math.random() * Math.max(1, maxTop - minTop);
-
-    pipes.push({
-        x: W + 50,
-        width: Math.max(55, W * 0.06),
-        top: top,
-        gap: gap,
-        passed: false
-    });
-}
-
-function update(dt) {
-
-    bird.velocity += H * 0.000028 * dt;
-    bird.y += bird.velocity * dt;
-
-    pipeTimer += dt;
-
-    if (pipeTimer > 1500) {
-        createPipe();
-        pipeTimer = 0;
-    }
-
-    const speed = W * 0.00038 * dt;
-
-    for (let i = pipes.length - 1; i >= 0; i--) {
-
-        const p = pipes[i];
-
-        p.x -= speed;
-
-        if (!p.passed && p.x + p.width < bird.x) {
-            p.passed = true;
-            score++;
-
-            scoreText.textContent = score;
-
-            if (score > bestScore) {
-                bestScore = score;
-                localStorage.setItem("slyBest", bestScore);
-            }
-        }
-
-        if (p.x + p.width < 0) {
-            pipes.splice(i, 1);
-        }
-    }
-
-    if (
-        bird.y - bird.r < 0 ||
-        bird.y + bird.r > H
-    ) {
-        endGame();
-    }
-
-    for (const p of pipes) {
-
-        const hitX =
-            bird.x + bird.r > p.x &&
-            bird.x - bird.r < p.x + p.width;
-
-        const hitY =
-            bird.y - bird.r < p.top ||
-            bird.y + bird.r > p.top + p.gap;
-
-        if (hitX && hitY) {
-            endGame();
-        }
-    }
-}
-
-function drawBackground() {
-
-    const gradient = ctx.createLinearGradient(0,0,0,H);
-
-    gradient.addColorStop(0, "#55c7e5");
-    gradient.addColorStop(1, "#d7f7ff");
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0,0,W,H);
-
-    // nuvens
-    ctx.fillStyle = "rgba(255,255,255,.8)";
-
-    for (let i = 0; i < 5; i++) {
-
-        const x = (i * 230 + 100) % (W + 200) - 100;
-        const y = 70 + (i % 3) * 80;
-
-        ctx.beginPath();
-        ctx.arc(x, y, 30, 0, Math.PI*2);
-        ctx.arc(x+35, y-10, 40, 0, Math.PI*2);
-        ctx.arc(x+75, y, 30, 0, Math.PI*2);
-        ctx.fill();
-    }
-
-    // chão
-    ctx.fillStyle = "#6ac34a";
-    ctx.fillRect(0,H-35,W,35);
-
-    ctx.fillStyle = "#4b9c35";
-    ctx.fillRect(0,H-35,W,6);
-}
-
-function drawPipes() {
-
-    for (const p of pipes) {
-
-        ctx.fillStyle = "#35a832";
-
-        ctx.fillRect(
-            p.x,
-            0,
-            p.width,
-            p.top
-        );
-
-        ctx.fillRect(
-            p.x,
-            p.top + p.gap,
-            p.width,
-            H
-        );
-
-        ctx.fillStyle = "#258326";
-
-        ctx.fillRect(
-            p.x - 7,
-            p.top - 18,
-            p.width + 14,
-            18
-        );
-
-        ctx.fillRect(
-            p.x - 7,
-            p.top + p.gap,
-            p.width + 14,
-            18
-        );
-    }
-}
-
-function drawBird() {
-
-    const skin = skins[selectedSkin];
-
-    ctx.save();
-
-    ctx.translate(bird.x, bird.y);
-
-    const angle = Math.max(
-        -0.5,
-        Math.min(0.7, bird.velocity / 10)
-    );
-
-    ctx.rotate(angle);
-
-    // corpo
-    ctx.fillStyle = skin.color;
-
-    ctx.beginPath();
-    ctx.arc(0, 0, bird.r, 0, Math.PI*2);
-    ctx.fill();
-
-    // olho
-    ctx.fillStyle = "white";
-
-    ctx.beginPath();
-    ctx.arc(
-        bird.r * 0.35,
-        -bird.r * 0.35,
-        bird.r * 0.35,
-        0,
-        Math.PI*2
-    );
-    ctx.fill();
-
-    ctx.fillStyle = "black";
-
-    ctx.beginPath();
-    ctx.arc(
-        bird.r * 0.45,
-        -bird.r * 0.35,
-        bird.r * 0.12,
-        0,
-        Math.PI*2
-    );
-    ctx.fill();
-
-    // bico
-    ctx.fillStyle = "#ff8c00";
-
-    ctx.beginPath();
-    ctx.moveTo(bird.r * 0.8, 0);
-    ctx.lineTo(bird.r * 1.5, bird.r * 0.25);
-    ctx.lineTo(bird.r * 0.8, bird.r * 0.45);
-    ctx.closePath();
-    ctx.fill();
-
-    // detalhes das skins
-
-    if (selectedSkin === 1) {
-        // herói
-        ctx.fillStyle = "#e52d2d";
-        ctx.fillRect(
-            -bird.r * 0.8,
-            bird.r * 0.1,
-            bird.r * 1.2,
-            bird.r * 0.3
-        );
-    }
-
-    if (selectedSkin === 2) {
-        // fogo
-        ctx.fillStyle = "#ff9d00";
-
-        ctx.beginPath();
-        ctx.moveTo(-bird.r, 0);
-        ctx.lineTo(-bird.r*1.8, -bird.r*.8);
-        ctx.lineTo(-bird.r*1.4, 0);
-        ctx.lineTo(-bird.r*1.8, bird.r*.8);
-        ctx.closePath();
-        ctx.fill();
-    }
-
-    if (selectedSkin === 3) {
-        // robô
-        ctx.strokeStyle = "#222";
-        ctx.lineWidth = 3;
-
-        ctx.strokeRect(
-            -bird.r*.65,
-            -bird.r*.65,
-            bird.r*1.3,
-            bird.r*1.3
-        );
-
-        ctx.fillStyle = "#00ffff";
-        ctx.fillRect(
-            -bird.r*.2,
-            bird.r*.45,
-            bird.r*.4,
-            bird.r*.12
-        );
-    }
-
-    if (selectedSkin === 4) {
-        // alien
-        ctx.fillStyle = "#9aff75";
-
-        ctx.beginPath();
-        ctx.ellipse(
-            0,
-            -bird.r*.2,
-            bird.r*.75,
-            bird.r*.95,
-            0,
-            0,
-            Math.PI*2
-        );
-        ctx.fill();
-
-        ctx.fillStyle = "black";
-
-        ctx.beginPath();
-        ctx.arc(
-            -bird.r*.3,
-            -bird.r*.35,
-            bird.r*.15,
-            0,
-            Math.PI*2
-        );
-        ctx.arc(
-            bird.r*.3,
-            -bird.r*.35,
-            bird.r*.15,
-            0,
-            Math.PI*2
-        );
-        ctx.fill();
-    }
-
-    if (selectedSkin === 5) {
-        // sombrio
-        ctx.fillStyle = "#5e477d";
-
-        ctx.beginPath();
-        ctx.moveTo(-bird.r*.4, -bird.r);
-        ctx.lineTo(-bird.r*1.3, -bird.r*.3);
-        ctx.lineTo(-bird.r*.5, -bird.r*.2);
-        ctx.closePath();
-        ctx.fill();
-    }
-
-    ctx.restore();
-}
-
-function draw() {
-
-    drawBackground();
-    drawPipes();
-    drawBird();
-}
-
-function loop(time) {
-
-    if (!playing) return;
-
-    const dt = Math.min(
-        40,
-        time - lastTime
-    );
-
-    lastTime = time;
-
-    update(dt);
-    draw();
-
-    requestAnimationFrame(loop);
-}
-
-function endGame() {
-
-    if (!playing) return;
-
-    playing = false;
-
-    finalScore.textContent = score;
-
-    scoreText.style.display = "none";
-    gameOver.style.display = "flex";
-
-    drawSkins();
-}
-
-// força tentativa de tela horizontal
-async function landscape() {
-
-    try {
-        if (screen.orientation &&
-            screen.orientation.lock) {
-
-            await screen.orientation.lock("landscape");
-        }
-    } catch(e) {}
-}
-
-document.addEventListener("fullscreenchange", landscape);
-
-document.getElementById("start").addEventListener("click", landscape);
-</script>
-
-</body>
-</html>
+/* =========================
+   MENU
