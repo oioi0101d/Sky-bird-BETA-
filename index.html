@@ -545,4 +545,600 @@ function update(delta){
 
     const pipeSpeed =
         Math.max(
-            180
+            180,
+            W * 0.32
+        );
+
+    pipeTimer += delta;
+
+    if(pipeTimer >= 1.55){
+
+        pipeTimer = 0;
+
+        createPipe();
+
+    }
+
+
+    for(let i=pipes.length-1;i>=0;i--){
+
+        const pipe = pipes[i];
+
+        pipe.x -=
+            pipeSpeed * delta;
+
+
+        /*
+           Pontuação
+        */
+
+        if(
+            !pipe.passed &&
+            pipe.x + pipe.width < bird.x
+        ){
+
+            pipe.passed = true;
+
+            score++;
+
+            scoreText.textContent =
+                score;
+
+            if(score > bestScore){
+
+                bestScore = score;
+
+                localStorage.setItem(
+                    "skyBest",
+                    bestScore
+                );
+
+            }
+
+        }
+
+
+        if(
+            pipe.x + pipe.width < -50
+        ){
+
+            pipes.splice(i,1);
+
+        }
+
+    }
+
+
+    /* COLISÃO COM TELA */
+
+    if(
+        bird.y - bird.size < 0 ||
+        bird.y + bird.size > H
+    ){
+
+        endGame();
+
+        return;
+
+    }
+
+
+    /* COLISÃO COM CANOS */
+
+    for(const pipe of pipes){
+
+        const birdLeft =
+            bird.x - bird.size * 0.75;
+
+        const birdRight =
+            bird.x + bird.size * 0.75;
+
+        const birdTop =
+            bird.y - bird.size * 0.75;
+
+        const birdBottom =
+            bird.y + bird.size * 0.75;
+
+
+        const pipeLeft =
+            pipe.x;
+
+        const pipeRight =
+            pipe.x + pipe.width;
+
+        const bottomPipeTop =
+            pipe.top + pipe.gap;
+
+
+        const hitX =
+            birdRight > pipeLeft &&
+            birdLeft < pipeRight;
+
+        const hitY =
+            birdTop < pipe.top ||
+            birdBottom > bottomPipeTop;
+
+
+        if(hitX && hitY){
+
+            endGame();
+
+            return;
+
+        }
+
+    }
+
+}
+
+
+/* =========================
+   DESENHAR FUNDO
+========================= */
+
+function drawBackground(){
+
+    ctx.fillStyle = "#70c5ce";
+
+    ctx.fillRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    /* nuvens */
+
+    ctx.fillStyle =
+        "rgba(255,255,255,.75)";
+
+    for(let i=0;i<5;i++){
+
+        const x =
+            (i * W * 0.27 + 80) % (W+150);
+
+        const y =
+            50 + (i%3)*65;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            25,
+            0,
+            Math.PI*2
+        );
+
+        ctx.arc(
+            x+30,
+            y-12,
+            32,
+            0,
+            Math.PI*2
+        );
+
+        ctx.arc(
+            x+65,
+            y,
+            25,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+    }
+
+}
+
+
+/* =========================
+   DESENHAR CANOS
+========================= */
+
+function drawPipes(){
+
+    for(const pipe of pipes){
+
+        const bottomY =
+            pipe.top + pipe.gap;
+
+
+        /* tubo de cima */
+
+        ctx.fillStyle = "#32b532";
+
+        ctx.fillRect(
+            pipe.x,
+            0,
+            pipe.width,
+            pipe.top
+        );
+
+
+        /* borda */
+
+        ctx.fillStyle = "#238523";
+
+        ctx.fillRect(
+            pipe.x,
+            pipe.top - 15,
+            pipe.width,
+            15
+        );
+
+
+        /* tubo de baixo */
+
+        ctx.fillStyle = "#32b532";
+
+        ctx.fillRect(
+            pipe.x,
+            bottomY,
+            pipe.width,
+            H-bottomY
+        );
+
+
+        ctx.fillStyle = "#238523";
+
+        ctx.fillRect(
+            pipe.x,
+            bottomY,
+            pipe.width,
+            15
+        );
+
+    }
+
+}
+
+
+/* =========================
+   DESENHAR PÁSSARO
+========================= */
+
+function drawBird(){
+
+    const skin =
+        skins[selectedSkin];
+
+
+    const x = bird.x;
+    const y = bird.y;
+    const r = bird.size;
+
+
+    ctx.save();
+
+    /*
+       Rotação conforme velocidade.
+    */
+
+    const angle =
+        Math.max(
+            -0.5,
+            Math.min(
+                1.0,
+                bird.velocity / 600
+            )
+        );
+
+    ctx.translate(x,y);
+
+    ctx.rotate(angle);
+
+
+    /* =====================
+       FÊNIX
+    ===================== */
+
+    if(selectedSkin === 2){
+
+        ctx.fillStyle = "#ff7a00";
+
+        ctx.beginPath();
+
+        ctx.moveTo(-r*1.4,r*.8);
+        ctx.lineTo(-r*2,r*1.6);
+        ctx.lineTo(-r*1.1,r*.2);
+        ctx.lineTo(-r*1.7,-r*.8);
+        ctx.lineTo(-r*.4,-r*.3);
+
+        ctx.fill();
+
+    }
+
+
+    /* =====================
+       SOMBRIO
+    ===================== */
+
+    if(selectedSkin === 5){
+
+        ctx.shadowColor = "#7b4dff";
+        ctx.shadowBlur = 18;
+
+    }
+
+
+    /* CORPO */
+
+    ctx.fillStyle =
+        skin.color;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        0,
+        0,
+        r,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+
+
+    /* ASA */
+
+    ctx.fillStyle =
+        selectedSkin === 3
+        ? "#626970"
+        : "#e5aa00";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        -r*.3,
+        r*.35,
+        r*.75,
+        r*.38,
+        -.3,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* =====================
+       ROBÔ
+    ===================== */
+
+    if(selectedSkin === 3){
+
+        ctx.strokeStyle = "#333";
+
+        ctx.lineWidth = 3;
+
+        ctx.strokeRect(
+            -r*.65,
+            -r*.65,
+            r*1.3,
+            r*1.3
+        );
+
+        ctx.fillStyle = "#ff3333";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            r*.35,
+            -r*.2,
+            r*.12,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    /* =====================
+       ALIEN
+    ===================== */
+
+    if(selectedSkin === 4){
+
+        ctx.fillStyle = "#111";
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            r*.35,
+            -r*.2,
+            r*.22,
+            r*.35,
+            -.3,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    /* CAPA DO HERÓI */
+
+    if(selectedSkin === 1){
+
+        ctx.fillStyle = "#e21b23";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -r*.3,
+            r*.3
+        );
+
+        ctx.lineTo(
+            -r*1.7,
+            r*1.3
+        );
+
+        ctx.lineTo(
+            -r*1.1,
+            r*.1
+        );
+
+        ctx.fill();
+
+    }
+
+
+    /* OLHO */
+
+    ctx.fillStyle = "white";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        r*.45,
+        -r*.3,
+        r*.28,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    ctx.fillStyle = "black";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        r*.52,
+        -r*.3,
+        r*.12,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* BICO */
+
+    ctx.fillStyle =
+        "#ff8c00";
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        r*.75,
+        0
+    );
+
+    ctx.lineTo(
+        r*1.55,
+        r*.2
+    );
+
+    ctx.lineTo(
+        r*.75,
+        r*.4
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    ctx.restore();
+
+}
+
+
+/* =========================
+   DESENHAR
+========================= */
+
+function draw(){
+
+    drawBackground();
+
+    drawPipes();
+
+    drawBird();
+
+}
+
+
+/* =========================
+   LOOP
+========================= */
+
+function gameLoop(now){
+
+    if(!playing) return;
+
+
+    const delta =
+        (now-lastTime)/1000;
+
+    lastTime = now;
+
+
+    update(delta);
+
+    draw();
+
+
+    if(playing){
+
+        requestAnimationFrame(
+            gameLoop
+        );
+
+    }
+
+}
+
+
+/* =========================
+   GAME OVER
+========================= */
+
+function endGame(){
+
+    if(!playing) return;
+
+    playing = false;
+
+    finalScore.textContent =
+        score;
+
+    bestFinal.textContent =
+        bestScore;
+
+    scoreText.style.display =
+        "none";
+
+    gameOver.style.display =
+        "flex";
+
+    createSkins();
+
+}
+
+
+/* =========================
+   INICIAL
+========================= */
+
+drawBackground();
+
+drawBird();
+
+</script>
+
+</body>
+</html>
