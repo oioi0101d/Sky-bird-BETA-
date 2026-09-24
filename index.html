@@ -17,6 +17,7 @@
     box-sizing:border-box;
     margin:0;
     padding:0;
+    touch-action:none;
 }
 
 html,body{
@@ -25,20 +26,15 @@ html,body{
     overflow:hidden;
     background:#70c5ce;
     font-family:Arial,sans-serif;
-    touch-action:none;
 }
 
-canvas{
+#game{
     position:fixed;
     inset:0;
-    width:100%;
-    height:100%;
+    width:100vw;
+    height:100vh;
     display:block;
 }
-
-/* =========================
-   TELA DEITADA
-========================= */
 
 #rotate{
     display:none;
@@ -50,8 +46,8 @@ canvas{
     align-items:center;
     justify-content:center;
     text-align:center;
-    font:bold 25px Arial;
-    padding:30px;
+    font-size:25px;
+    font-weight:bold;
 }
 
 @media (orientation:portrait){
@@ -62,17 +58,11 @@ canvas{
 
     #menu,
     #gameOver,
-    #hud,
+    #score,
     #coinHud{
         visibility:hidden;
     }
-
 }
-
-
-/* =========================
-   MENU
-========================= */
 
 #menu{
     position:fixed;
@@ -84,8 +74,6 @@ canvas{
     justify-content:center;
     align-items:center;
 
-    text-align:center;
-
     background:
         linear-gradient(
             #58c8e8,
@@ -94,15 +82,10 @@ canvas{
 }
 
 #menu h1{
-    font-size:
-        clamp(45px,9vw,85px);
-
     color:white;
-
-    text-shadow:
-        4px 4px #333;
-
-    margin-bottom:8px;
+    font-size:clamp(45px,9vw,80px);
+    text-shadow:4px 4px #333;
+    margin-bottom:5px;
 }
 
 #menu p{
@@ -111,24 +94,18 @@ canvas{
     margin:5px;
 }
 
-
-/* =========================
-   SKINS
-========================= */
-
 #skins{
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
     gap:8px;
-
-    max-width:900px;
-
+    max-width:850px;
     padding:10px;
 }
 
 .skin{
     min-width:120px;
+    padding:10px;
 
     border:3px solid white;
     border-radius:12px;
@@ -136,29 +113,20 @@ canvas{
     background:#222;
     color:white;
 
-    padding:10px;
-
     font-size:16px;
     font-weight:bold;
 }
 
 .skin.selected{
     border-color:#ffe600;
-
-    box-shadow:
-        0 0 15px #ffe600;
+    box-shadow:0 0 15px #ffe600;
 }
 
 .skin.locked{
     opacity:.4;
 }
 
-
-/* =========================
-   BOTÕES
-========================= */
-
-.mainButton{
+.button{
     margin-top:12px;
 
     padding:14px 42px;
@@ -167,245 +135,150 @@ canvas{
     border-radius:15px;
 
     background:#35b84a;
-
     color:white;
 
     font-size:24px;
     font-weight:bold;
 }
 
-
-/* =========================
-   HUD
-========================= */
-
-#hud{
+#score{
     position:fixed;
-
     z-index:5;
 
     top:12px;
     left:50%;
 
-    transform:
-        translateX(-50%);
+    transform:translateX(-50%);
 
     display:none;
 
     color:white;
+    font-size:clamp(30px,5vw,55px);
+    font-weight:bold;
 
-    font:bold 28px Arial;
-
-    text-shadow:
-        3px 3px #333;
+    text-shadow:4px 4px #333;
 }
 
 #coinHud{
     position:fixed;
-
     z-index:5;
 
-    top:15px;
-    left:18px;
+    top:18px;
+    left:20px;
 
     display:none;
 
     color:white;
+    font-size:22px;
+    font-weight:bold;
 
-    font:bold 20px Arial;
-
-    text-shadow:
-        2px 2px #333;
+    text-shadow:3px 3px #333;
 }
-
-
-/* =========================
-   GAME OVER
-========================= */
 
 #gameOver{
     position:fixed;
-
     inset:0;
-
     z-index:20;
 
     display:none;
 
     flex-direction:column;
-
     justify-content:center;
     align-items:center;
 
-    text-align:center;
-
-    background:
-        rgba(0,0,0,.55);
-
+    background:rgba(0,0,0,.6);
     color:white;
 }
 
-#gameOver h1{
-    font-size:
-        clamp(45px,8vw,75px);
-
-    color:white;
-
-    text-shadow:
-        4px 4px #000;
-
-    margin-bottom:15px;
+#gameOver h2{
+    font-size:clamp(45px,8vw,70px);
+    text-shadow:4px 4px #000;
 }
 
 #gameOver p{
-    color:white;
-
     font-size:22px;
-
-    margin:5px;
+    margin:6px;
 }
 
 </style>
 </head>
 
-
 <body>
-
 
 <canvas id="game"></canvas>
 
-
-<!-- =========================
-     TELA DE CELULAR EM PÉ
-========================= -->
-
 <div id="rotate">
-
-    📱
-
-    <br><br>
-
-    Vire o celular de lado
-    para jogar!
-
-    <br><br>
-
-    <b>SKY BIRD</b>
-
+    📱<br><br>
+    VIRE O CELULAR DE LADO<br>
+    PARA JOGAR SKY BIRD
 </div>
 
-
-<!-- =========================
-     HUD
-========================= -->
-
-<div id="hud">
-
-    Pontos:
-    <span id="score">0</span>
-
+<div id="score">
+    0
 </div>
-
 
 <div id="coinHud">
-
-    🪙
-    <span id="coins">0</span>
-
+    🪙 <span id="coins">0</span>
 </div>
-
-
-<!-- =========================
-     MENU
-========================= -->
 
 <div id="menu">
 
-    <h1>
-        🐦 SKY BIRD
-    </h1>
+    <h1>🐦 SKY BIRD</h1>
+
+    <p>Escolha seu pássaro</p>
 
     <p>
-        Escolha seu pássaro
-    </p>
-
-    <p>
-
         🏆 Recorde:
         <span id="best">0</span>
-
         &nbsp;&nbsp;
-
-        🪙
-        <span id="bank">0</span>
-
+        🪙:
+        <span id="totalCoins">0</span>
     </p>
 
     <div id="skins"></div>
 
     <button
-        class="mainButton"
+        class="button"
         id="start">
-
         JOGAR
-
     </button>
 
 </div>
-
-
-<!-- =========================
-     GAME OVER
-========================= -->
 
 <div id="gameOver">
 
-    <h1>
-        GAME OVER
-    </h1>
+    <h2>GAME OVER</h2>
 
     <p>
-
         Pontuação:
         <span id="finalScore">0</span>
-
     </p>
 
     <p>
-
         Recorde:
         <span id="finalBest">0</span>
-
     </p>
 
     <p>
-
         🪙 Moedas:
         <span id="finalCoins">0</span>
-
     </p>
 
     <button
-        class="mainButton"
+        class="button"
         id="restart">
-
         JOGAR NOVAMENTE
-
     </button>
 
     <button
-        class="mainButton"
-        id="menuButton">
-
+        class="button"
+        id="backMenu">
         MENU
-
     </button>
 
 </div>
 
-
 <script>
-
 
 /* =========================
    CANVAS
@@ -417,13 +290,8 @@ const canvas =
 const ctx =
     canvas.getContext("2d");
 
-
-let W =
-    window.innerWidth;
-
-let H =
-    window.innerHeight;
-
+let W = 0;
+let H = 0;
 
 function resize(){
 
@@ -437,9 +305,7 @@ function resize(){
 
 }
 
-
 resize();
-
 
 window.addEventListener(
     "resize",
@@ -456,88 +322,76 @@ const skins = [
     {
         name:"🐦 Comum",
         unlock:0,
-        color:"#ffd21f",
-        wing:"#e4a900"
+        body:"#ffd21f",
+        wing:"#e5aa00"
     },
 
     {
         name:"🦸 Herói",
         unlock:100,
-        color:"#2878ff",
-        wing:"#164da8"
+        body:"#2878ff",
+        wing:"#1652b5"
     },
 
     {
         name:"🔥 Fênix",
         unlock:300,
-        color:"#ff4b16",
-        wing:"#c82c00"
+        body:"#ff4b16",
+        wing:"#c83200"
     },
 
     {
         name:"🤖 Robô",
         unlock:500,
-        color:"#9da5ad",
+        body:"#9da5ad",
         wing:"#626970"
     },
 
     {
         name:"👽 Alien",
         unlock:1000,
-        color:"#65ff50",
-        wing:"#25a928"
+        body:"#65ff50",
+        wing:"#269e28"
     },
 
     {
         name:"🌑 Sombrio",
         unlock:2000,
-        color:"#292333",
+        body:"#292333",
         wing:"#15111c"
     }
 
 ];
 
 
-/* =========================
-   SAVE
-========================= */
-
 let bestScore =
     Number(
-        localStorage.getItem(
-            "skyBest"
-        ) || 0
+        localStorage.getItem("skyBest") || 0
     );
-
 
 let totalCoins =
     Number(
-        localStorage.getItem(
-            "skyCoins"
-        ) || 0
+        localStorage.getItem("skyCoins") || 0
     );
-
 
 let selectedSkin =
     Number(
-        localStorage.getItem(
-            "skySkin"
-        ) || 0
+        localStorage.getItem("skySkin") || 0
     );
-
 
 if(
     !skins[selectedSkin] ||
-    bestScore <
-    skins[selectedSkin].unlock
+    bestScore < skins[selectedSkin].unlock
 ){
-
     selectedSkin = 0;
-
 }
 
 
-function saveData(){
+/* =========================
+   SALVAR
+========================= */
+
+function save(){
 
     localStorage.setItem(
         "skyBest",
@@ -558,118 +412,57 @@ function saveData(){
 
 
 /* =========================
-   ELEMENTOS
-========================= */
-
-const menu =
-    document.getElementById(
-        "menu"
-    );
-
-const gameOver =
-    document.getElementById(
-        "gameOver"
-    );
-
-const hud =
-    document.getElementById(
-        "hud"
-    );
-
-const coinHud =
-    document.getElementById(
-        "coinHud"
-    );
-
-const scoreText =
-    document.getElementById(
-        "score"
-    );
-
-const coinsText =
-    document.getElementById(
-        "coins"
-    );
-
-
-/* =========================
-   MENU DE SKINS
+   MENU
 ========================= */
 
 function createSkins(){
 
     const box =
-        document.getElementById(
-            "skins"
-        );
+        document.getElementById("skins");
 
     box.innerHTML = "";
-
 
     skins.forEach(
         (skin,index)=>{
 
             const button =
-                document.createElement(
-                    "button"
-                );
-
+                document.createElement("button");
 
             const unlocked =
-                bestScore >=
-                skin.unlock;
+                bestScore >= skin.unlock;
 
+            button.className = "skin";
 
-            button.className =
-                "skin";
-
-
-            if(
-                index ===
-                selectedSkin
-            ){
-
-                button.classList.add(
-                    "selected"
-                );
-
+            if(index === selectedSkin){
+                button.classList.add("selected");
             }
-
 
             if(!unlocked){
-
-                button.classList.add(
-                    "locked"
-                );
-
+                button.classList.add("locked");
             }
-
 
             if(unlocked){
 
                 button.textContent =
                     skin.name +
                     (
-                        index > 0
+                        skin.unlock > 0
                         ? " ✓"
                         : ""
                     );
 
-
                 button.onclick =
                     function(){
 
-                        selectedSkin =
-                            index;
+                        selectedSkin = index;
 
-                        saveData();
+                        save();
 
                         createSkins();
 
                     };
 
-            }
-            else{
+            }else{
 
                 button.textContent =
                     skin.name +
@@ -678,62 +471,45 @@ function createSkins(){
 
             }
 
-
-            box.appendChild(
-                button
-            );
+            box.appendChild(button);
 
         }
     );
 
-
     document.getElementById(
         "best"
-    ).textContent =
-        bestScore;
-
+    ).textContent = bestScore;
 
     document.getElementById(
-        "bank"
-    ).textContent =
-        totalCoins;
+        "totalCoins"
+    ).textContent = totalCoins;
 
 }
-
 
 createSkins();
 
 
 /* =========================
-   OBJETOS DO JOGO
+   JOGO
 ========================= */
 
 let bird;
 
-let clouds = [];
-
+let normalClouds = [];
 let fatalClouds = [];
-
 let coins = [];
-
 let particles = [];
 
-
 let score = 0;
-
 let runCoins = 0;
 
 let playing = false;
 
 let lastTime = 0;
-
 let gameTime = 0;
 
-
 let cloudTimer = 0;
-
 let fatalTimer = 0;
-
 let coinTimer = 0;
 
 
@@ -745,55 +521,43 @@ function resetGame(){
 
     bird = {
 
-        x:
-            W * 0.23,
+        x:W * .23,
 
-        y:
-            H * 0.45,
+        y:H * .45,
 
         velocity:0,
 
         radius:
             Math.max(
                 22,
-                Math.min(W,H)
-                * 0.055
+                Math.min(W,H) * .055
             ),
 
         rotation:0
 
     };
 
-
-    clouds = [];
-
+    normalClouds = [];
     fatalClouds = [];
-
     coins = [];
-
     particles = [];
 
-
     score = 0;
-
     runCoins = 0;
 
     gameTime = 0;
 
+    cloudTimer = .2;
+    fatalTimer = 2.5;
+    coinTimer = .8;
 
-    cloudTimer = 0.2;
+    document.getElementById(
+        "score"
+    ).textContent = "0";
 
-    fatalTimer = 2;
-
-    coinTimer = 0.8;
-
-
-    scoreText.textContent =
-        "0";
-
-
-    coinsText.textContent =
-        "0";
+    document.getElementById(
+        "coins"
+    ).textContent = "0";
 
 }
 
@@ -806,24 +570,26 @@ function startGame(){
 
     resetGame();
 
-    menu.style.display =
-        "none";
+    document.getElementById(
+        "menu"
+    ).style.display = "none";
 
-    gameOver.style.display =
-        "none";
+    document.getElementById(
+        "gameOver"
+    ).style.display = "none";
 
-    hud.style.display =
-        "block";
+    document.getElementById(
+        "score"
+    ).style.display = "block";
 
-    coinHud.style.display =
-        "block";
-
+    document.getElementById(
+        "coinHud"
+    ).style.display = "block";
 
     playing = true;
 
     lastTime =
         performance.now();
-
 
     requestAnimationFrame(
         gameLoop
@@ -838,26 +604,11 @@ function startGame(){
 
 function flap(){
 
-    if(!playing){
+    if(!playing) return;
 
-        return;
+    bird.velocity = -390;
 
-    }
-
-
-    bird.velocity =
-        -390;
-
-    bird.rotation =
-        -0.5;
-
-
-    createParticles(
-        bird.x - 10,
-        bird.y + 10,
-        5,
-        "#ffffff"
-    );
+    bird.rotation = -0.5;
 
 }
 
@@ -868,26 +619,25 @@ function flap(){
 
 canvas.addEventListener(
     "pointerdown",
-    function(event){
+    function(e){
 
-        event.preventDefault();
+        e.preventDefault();
 
         flap();
 
     }
 );
 
-
 document.addEventListener(
     "keydown",
-    function(event){
+    function(e){
 
         if(
-            event.code === "Space" ||
-            event.code === "ArrowUp"
+            e.code === "Space" ||
+            e.code === "ArrowUp"
         ){
 
-            event.preventDefault();
+            e.preventDefault();
 
             flap();
 
@@ -899,43 +649,126 @@ document.addEventListener(
 
 document.getElementById(
     "start"
-).onclick =
-    startGame;
+).onclick = startGame;
 
 
 document.getElementById(
     "restart"
-).onclick =
-    startGame;
+).onclick = startGame;
 
 
 document.getElementById(
-    "menuButton"
+    "backMenu"
 ).onclick =
-    function(){
+function(){
 
-        playing = false;
+    playing = false;
 
-        gameOver.style.display =
-            "none";
+    document.getElementById(
+        "gameOver"
+    ).style.display = "none";
 
-        menu.style.display =
-            "flex";
+    document.getElementById(
+        "menu"
+    ).style.display = "flex";
 
-        createSkins();
+    createSkins();
 
-        resetGame();
+    resetGame();
 
-        draw();
+    draw();
 
-    };
+};
+
+
+/* =========================
+   NUVEM NORMAL
+========================= */
+
+function createNormalCloud(){
+
+    normalClouds.push({
+
+        x:W + 100,
+
+        y:
+            70 +
+            Math.random() *
+            (H * .60),
+
+        size:
+            25 +
+            Math.random() * 20,
+
+        speed:
+            45 +
+            Math.random() * 25
+
+    });
+
+}
+
+
+/* =========================
+   NUVEM FATAL
+========================= */
+
+function createFatalCloud(){
+
+    fatalClouds.push({
+
+        x:W + 120,
+
+        y:
+            70 +
+            Math.random() *
+            (H * .60),
+
+        size:
+            38 +
+            Math.random() * 12,
+
+        speed:
+            90 +
+            Math.random() * 30,
+
+        pulse:0
+
+    });
+
+}
+
+
+/* =========================
+   MOEDA
+========================= */
+
+function createCoin(){
+
+    coins.push({
+
+        x:W + 50,
+
+        y:
+            70 +
+            Math.random() *
+            (H * .62),
+
+        radius:15,
+
+        spin:
+            Math.random() * Math.PI * 2
+
+    });
+
+}
 
 
 /* =========================
    PARTÍCULAS
 ========================= */
 
-function createParticles(
+function particlesAt(
     x,
     y,
     amount,
@@ -954,121 +787,21 @@ function createParticles(
 
             y:y,
 
-            velocityX:
-                (
-                    Math.random()
-                    -0.5
-                ) * 150,
+            vx:
+                (Math.random()-.5)
+                * 160,
 
-            velocityY:
-                (
-                    Math.random()
-                    -0.5
-                ) * 150,
+            vy:
+                (Math.random()-.5)
+                * 160,
 
-            life:
-                0.4 +
-                Math.random()
-                * 0.4,
+            life:.5,
 
             color:color
 
         });
 
     }
-
-}
-
-
-/* =========================
-   NUVEM NORMAL
-========================= */
-
-function createCloud(){
-
-    clouds.push({
-
-        x:
-            W + 120,
-
-        y:
-            60 +
-            Math.random()
-            * H * 0.58,
-
-        scale:
-            0.7 +
-            Math.random()
-            * 0.6,
-
-        speed:
-            55 +
-            Math.random()
-            * 35
-
-    });
-
-}
-
-
-/* =========================
-   NUVEM FATAL
-========================= */
-
-function createFatalCloud(){
-
-    fatalClouds.push({
-
-        x:
-            W + 120,
-
-        y:
-            80 +
-            Math.random()
-            * H * 0.55,
-
-        scale:
-            0.8 +
-            Math.random()
-            * 0.35,
-
-        speed:
-            90 +
-            Math.random()
-            * 40,
-
-        phase:
-            Math.random()
-            * Math.PI * 2
-
-    });
-
-}
-
-
-/* =========================
-   MOEDA
-========================= */
-
-function createCoin(){
-
-    coins.push({
-
-        x:
-            W + 50,
-
-        y:
-            80 +
-            Math.random()
-            * H * 0.62,
-
-        radius:15,
-
-        rotation:
-            Math.random()
-            * Math.PI * 2
-
-    });
 
 }
 
@@ -1082,9 +815,8 @@ function update(delta){
     delta =
         Math.min(
             delta,
-            0.035
+            .035
         );
-
 
     gameTime += delta;
 
@@ -1097,98 +829,79 @@ function update(delta){
     bird.y +=
         bird.velocity * delta;
 
-
     bird.rotation +=
-        1.8 * delta;
+        2 * delta;
 
-
-    if(
-        bird.rotation > 1
-    ){
-
+    if(bird.rotation > 1){
         bird.rotation = 1;
-
     }
 
 
     /* TIMERS */
 
     cloudTimer -= delta;
-
     fatalTimer -= delta;
-
     coinTimer -= delta;
 
 
-    if(
-        cloudTimer <= 0
-    ){
+    if(cloudTimer <= 0){
 
-        createCloud();
+        createNormalCloud();
 
         cloudTimer =
-            1 +
-            Math.random()
-            * 1.4;
+            1.2 +
+            Math.random() * 1.5;
 
     }
 
 
-    if(
-        coinTimer <= 0
-    ){
-
-        createCoin();
-
-        coinTimer =
-            0.75 +
-            Math.random()
-            * 1.1;
-
-    }
-
-
-    const difficulty =
-        Math.min(
-            2.2,
-            1 +
-            score / 30
-        );
-
-
-    if(
-        fatalTimer <= 0
-    ){
+    if(fatalTimer <= 0){
 
         createFatalCloud();
 
         fatalTimer =
-            Math.max(
-                1.3,
-                2.8 /
-                difficulty
-            ) +
-            Math.random()
-            * 1.5;
+            2.2 +
+            Math.random() * 1.8;
 
     }
 
 
-    /* =========================
-       MOVIMENTO NUVENS
-    ========================= */
+    if(coinTimer <= 0){
+
+        createCoin();
+
+        coinTimer =
+            .8 +
+            Math.random() * 1.2;
+
+    }
+
+
+    /* VELOCIDADE */
+
+    const speed =
+        1 +
+        Math.min(
+            1.5,
+            score / 100
+        );
+
+
+    /* NUVENS */
 
     for(
-        const cloud of clouds
+        const cloud of normalClouds
     ){
 
         cloud.x -=
             cloud.speed *
             delta *
-            difficulty;
+            speed;
 
     }
 
+
+    /* NUVENS FATAIS */
 
     for(
         const cloud of fatalClouds
@@ -1197,17 +910,15 @@ function update(delta){
         cloud.x -=
             cloud.speed *
             delta *
-            difficulty;
+            speed;
 
-        cloud.phase +=
-            5 * delta;
+        cloud.pulse +=
+            delta * 5;
 
     }
 
 
-    /* =========================
-       MOEDAS
-    ========================= */
+    /* MOEDAS */
 
     for(
         const coin of coins
@@ -1216,38 +927,29 @@ function update(delta){
         coin.x -=
             190 *
             delta *
-            difficulty;
+            speed;
 
-        coin.rotation +=
-            6 * delta;
+        coin.spin +=
+            delta * 7;
 
     }
 
 
-    /* =========================
-       PEGAR MOEDAS
-    ========================= */
+    /* PEGAR MOEDA */
 
     for(
-        let i =
-            coins.length - 1;
-        i >= 0;
+        let i=coins.length-1;
+        i>=0;
         i--
     ){
 
-        const coin =
-            coins[i];
-
+        const coin = coins[i];
 
         const distance =
             Math.hypot(
-                bird.x -
-                coin.x,
-
-                bird.y -
-                coin.y
+                bird.x - coin.x,
+                bird.y - coin.y
             );
-
 
         if(
             distance <
@@ -1257,33 +959,26 @@ function update(delta){
 
             runCoins++;
 
-
-            coinsText.textContent =
+            document.getElementById(
+                "coins"
+            ).textContent =
                 runCoins;
 
-
-            createParticles(
+            particlesAt(
                 coin.x,
                 coin.y,
-                12,
-                "#ffd21f"
+                10,
+                "#ffe600"
             );
 
-
-            coins.splice(
-                i,
-                1
-            );
+            coins.splice(i,1);
 
         }
         else if(
             coin.x < -60
         ){
 
-            coins.splice(
-                i,
-                1
-            );
+            coins.splice(i,1);
 
         }
 
@@ -1291,36 +986,30 @@ function update(delta){
 
 
     /* =========================
-       NUVENS FATAIS
+       COLISÃO NUVEM FATAL
     ========================= */
 
     for(
-        const cloud
-        of fatalClouds
+        const cloud of fatalClouds
     ){
 
         const distance =
             Math.hypot(
-                bird.x -
-                cloud.x,
-
-                bird.y -
-                cloud.y
+                bird.x - cloud.x,
+                bird.y - cloud.y
             );
-
 
         if(
             distance <
             bird.radius +
-            42 *
-            cloud.scale
+            cloud.size * .72
         ){
 
-            createParticles(
+            particlesAt(
                 bird.x,
                 bird.y,
-                25,
-                "#ff3030"
+                20,
+                "#ff3333"
             );
 
             endGame();
@@ -1334,64 +1023,48 @@ function update(delta){
 
     /* LIMPEZA */
 
-    clouds =
-        clouds.filter(
+    normalClouds =
+        normalClouds.filter(
             cloud =>
-                cloud.x > -180
+                cloud.x > -150
         );
-
 
     fatalClouds =
         fatalClouds.filter(
             cloud =>
-                cloud.x > -180
+                cloud.x > -150
         );
 
 
-    /* =========================
-       PARTÍCULAS
-    ========================= */
+    /* PARTÍCULAS */
 
     for(
-        let i =
-            particles.length - 1;
-        i >= 0;
+        let i=particles.length-1;
+        i>=0;
         i--
     ){
 
-        const particle =
-            particles[i];
+        const p = particles[i];
 
+        p.x +=
+            p.vx * delta;
 
-        particle.x +=
-            particle.velocityX *
+        p.y +=
+            p.vy * delta;
+
+        p.life -=
             delta;
 
-        particle.y +=
-            particle.velocityY *
-            delta;
+        if(p.life <= 0){
 
-        particle.life -=
-            delta;
-
-
-        if(
-            particle.life <= 0
-        ){
-
-            particles.splice(
-                i,
-                1
-            );
+            particles.splice(i,1);
 
         }
 
     }
 
 
-    /* =========================
-       BORDA DA TELA
-    ========================= */
+    /* BORDA */
 
     if(
         bird.y -
@@ -1408,7 +1081,7 @@ function update(delta){
     if(
         bird.y +
         bird.radius >
-        H - 55
+        H - 45
     ){
 
         endGame();
@@ -1418,24 +1091,90 @@ function update(delta){
     }
 
 
-    /* =========================
-       PONTUAÇÃO
-    ========================= */
+    /* PONTUAÇÃO */
 
     score =
         Math.floor(
             gameTime * 5
         );
 
-
-    scoreText.textContent =
+    document.getElementById(
+        "score"
+    ).textContent =
         score;
 
 }
 
 
 /* =========================
-   DESENHAR NUVEM NORMAL
+   FUNDO
+========================= */
+
+function drawBackground(){
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            0,
+            H
+        );
+
+    gradient.addColorStop(
+        0,
+        "#58c8e8"
+    );
+
+    gradient.addColorStop(
+        1,
+        "#b9f2ff"
+    );
+
+    ctx.fillStyle = gradient;
+
+    ctx.fillRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    /* SOL */
+
+    ctx.fillStyle =
+        "#ffe36b";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        W * .82,
+        H * .16,
+        38,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    /* CHÃO */
+
+    ctx.fillStyle =
+        "#79c94a";
+
+    ctx.fillRect(
+        0,
+        H - 45,
+        W,
+        45
+    );
+
+}
+
+
+/* =========================
+   NUVEM NORMAL
 ========================= */
 
 function drawNormalCloud(
@@ -1444,64 +1183,49 @@ function drawNormalCloud(
 
     ctx.save();
 
-
     ctx.translate(
         cloud.x,
         cloud.y
     );
 
-
-    ctx.scale(
-        cloud.scale,
-        cloud.scale
-    );
-
-
     ctx.fillStyle =
-        "rgba(255,255,255,.85)";
-
+        "rgba(255,255,255,.9)";
 
     ctx.beginPath();
-
 
     ctx.arc(
         -40,
         8,
+        cloud.size * .65,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.arc(
+        -10,
+        -10,
+        cloud.size * .9,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.arc(
         25,
-        0,
-        Math.PI * 2
-    );
-
-
-    ctx.arc(
-        -12,
-        -8,
-        34,
-        0,
-        Math.PI * 2
-    );
-
-
-    ctx.arc(
-        22,
         4,
-        29,
+        cloud.size * .75,
         0,
         Math.PI * 2
     );
-
 
     ctx.arc(
         48,
-        13,
-        20,
+        12,
+        cloud.size * .5,
         0,
         Math.PI * 2
     );
 
-
     ctx.fill();
-
 
     ctx.restore();
 
@@ -1509,7 +1233,7 @@ function drawNormalCloud(
 
 
 /* =========================
-   DESENHAR NUVEM FATAL
+   NUVEM FATAL
 ========================= */
 
 function drawFatalCloud(
@@ -1518,108 +1242,98 @@ function drawFatalCloud(
 
     ctx.save();
 
-
     ctx.translate(
         cloud.x,
-        cloud.y
-    );
-
-
-    ctx.scale(
-        cloud.scale,
-        cloud.scale
-    );
-
-
-    ctx.translate(
-        0,
+        cloud.y +
         Math.sin(
-            cloud.phase
+            cloud.pulse
         ) * 3
     );
 
 
-    /* NUVEM */
+    /* BRILHO */
+
+    ctx.shadowColor =
+        "#ff3030";
+
+    ctx.shadowBlur = 15;
+
+
+    /* CORPO DA NUVEM */
 
     ctx.fillStyle =
-        "#555b66";
+        "#5a5a66";
 
     ctx.strokeStyle =
-        "#30343b";
+        "#292933";
 
     ctx.lineWidth = 5;
 
 
     ctx.beginPath();
 
-
     ctx.arc(
-        -42,
+        -40,
         8,
-        28,
+        cloud.size * .65,
         0,
         Math.PI * 2
     );
 
-
     ctx.arc(
-        -15,
         -10,
-        38,
+        -10,
+        cloud.size * .9,
         0,
         Math.PI * 2
     );
-
 
     ctx.arc(
-        20,
+        25,
         4,
-        32,
+        cloud.size * .75,
         0,
         Math.PI * 2
     );
-
 
     ctx.arc(
         48,
-        14,
-        22,
+        12,
+        cloud.size * .5,
         0,
         Math.PI * 2
     );
-
 
     ctx.fill();
 
     ctx.stroke();
 
 
+    ctx.shadowBlur = 0;
+
+
     /* OLHOS */
 
     ctx.fillStyle =
-        "#ff3030";
-
+        "#ff3333";
 
     ctx.beginPath();
 
-
     ctx.arc(
         -17,
-        4,
+        2,
         6,
         0,
         Math.PI * 2
     );
-
 
     ctx.arc(
         23,
-        4,
+        2,
         6,
         0,
         Math.PI * 2
     );
-
 
     ctx.fill();
 
@@ -1627,27 +1341,23 @@ function drawFatalCloud(
     /* BOCA */
 
     ctx.strokeStyle =
-        "#ff3030";
+        "#ff3333";
 
-    ctx.lineWidth = 5;
-
+    ctx.lineWidth = 4;
 
     ctx.beginPath();
-
 
     ctx.moveTo(
         -22,
         22
     );
 
-
     ctx.quadraticCurveTo(
         2,
-        38,
-        28,
+        37,
+        27,
         21
     );
-
 
     ctx.stroke();
 
@@ -1658,7 +1368,7 @@ function drawFatalCloud(
 
 
 /* =========================
-   DESENHAR MOEDA
+   MOEDA
 ========================= */
 
 function drawCoin(
@@ -1667,41 +1377,35 @@ function drawCoin(
 
     ctx.save();
 
-
     ctx.translate(
         coin.x,
         coin.y
     );
 
-
     const scale =
-        Math.max(
-            0.2,
-            Math.abs(
-                Math.cos(
-                    coin.rotation
-                )
+        Math.abs(
+            Math.cos(
+                coin.spin
             )
         );
 
-
     ctx.scale(
-        scale,
+        Math.max(
+            .25,
+            scale
+        ),
         1
     );
-
 
     ctx.fillStyle =
         "#ffd21f";
 
     ctx.strokeStyle =
-        "#c98b00";
+        "#b57b00";
 
     ctx.lineWidth = 3;
 
-
     ctx.beginPath();
-
 
     ctx.arc(
         0,
@@ -1711,14 +1415,12 @@ function drawCoin(
         Math.PI * 2
     );
 
-
     ctx.fill();
 
     ctx.stroke();
 
-
     ctx.fillStyle =
-        "#fff1a0";
+        "#fff3a0";
 
     ctx.font =
         "bold 15px Arial";
@@ -1729,13 +1431,11 @@ function drawCoin(
     ctx.textBaseline =
         "middle";
 
-
     ctx.fillText(
         "$",
         0,
         1
     );
-
 
     ctx.restore();
 
@@ -1743,7 +1443,7 @@ function drawCoin(
 
 
 /* =========================
-   DESENHAR PÁSSARO
+   PÁSSARO
 ========================= */
 
 function drawBird(){
@@ -1751,25 +1451,16 @@ function drawBird(){
     const skin =
         skins[selectedSkin];
 
-
-    const x =
-        bird.x;
-
-    const y =
-        bird.y;
-
     const r =
         bird.radius;
 
 
     ctx.save();
 
-
     ctx.translate(
-        x,
-        y
+        bird.x,
+        bird.y
     );
-
 
     ctx.rotate(
         bird.rotation
@@ -1778,46 +1469,37 @@ function drawBird(){
 
     /* FÊNIX */
 
-    if(
-        selectedSkin === 2
-    ){
+    if(selectedSkin === 2){
 
         ctx.fillStyle =
             "#ff7a00";
 
-
         ctx.beginPath();
 
-
         ctx.moveTo(
-            -r * .5,
+            -r * .3,
             r * .3
         );
-
 
         ctx.lineTo(
             -r * 1.8,
             r * 1.3
         );
 
-
         ctx.lineTo(
             -r * 1.1,
             0
         );
-
 
         ctx.lineTo(
             -r * 1.8,
             -r
         );
 
-
         ctx.lineTo(
             -r * .3,
             -r * .2
         );
-
 
         ctx.fill();
 
@@ -1826,9 +1508,7 @@ function drawBird(){
 
     /* SOMBRIO */
 
-    if(
-        selectedSkin === 5
-    ){
+    if(selectedSkin === 5){
 
         ctx.shadowColor =
             "#8b55ff";
@@ -1842,11 +1522,9 @@ function drawBird(){
     /* CORPO */
 
     ctx.fillStyle =
-        skin.color;
-
+        skin.body;
 
     ctx.beginPath();
-
 
     ctx.arc(
         0,
@@ -1856,9 +1534,7 @@ function drawBird(){
         Math.PI * 2
     );
 
-
     ctx.fill();
-
 
     ctx.shadowBlur = 0;
 
@@ -1868,9 +1544,7 @@ function drawBird(){
     ctx.fillStyle =
         skin.wing;
 
-
     ctx.beginPath();
-
 
     ctx.ellipse(
         -r * .3,
@@ -1882,40 +1556,32 @@ function drawBird(){
         Math.PI * 2
     );
 
-
     ctx.fill();
 
 
-    /* HERÓI */
+    /* CAPA */
 
-    if(
-        selectedSkin === 1
-    ){
+    if(selectedSkin === 1){
 
         ctx.fillStyle =
             "#e21b23";
 
-
         ctx.beginPath();
-
 
         ctx.moveTo(
             -r * .2,
             r * .2
         );
 
-
         ctx.lineTo(
             -r * 1.7,
-            r * 1.25
+            r * 1.2
         );
-
 
         ctx.lineTo(
-            -r * 1.05,
+            -r,
             0
         );
-
 
         ctx.fill();
 
@@ -1924,15 +1590,12 @@ function drawBird(){
 
     /* ROBÔ */
 
-    if(
-        selectedSkin === 3
-    ){
+    if(selectedSkin === 3){
 
         ctx.strokeStyle =
             "#333";
 
         ctx.lineWidth = 3;
-
 
         ctx.strokeRect(
             -r * .65,
@@ -1941,13 +1604,10 @@ function drawBird(){
             r * 1.3
         );
 
-
         ctx.fillStyle =
             "#ff3333";
 
-
         ctx.beginPath();
-
 
         ctx.arc(
             r * .35,
@@ -1957,7 +1617,6 @@ function drawBird(){
             Math.PI * 2
         );
 
-
         ctx.fill();
 
     }
@@ -1965,16 +1624,12 @@ function drawBird(){
 
     /* ALIEN */
 
-    if(
-        selectedSkin === 4
-    ){
+    if(selectedSkin === 4){
 
         ctx.fillStyle =
             "#111";
 
-
         ctx.beginPath();
-
 
         ctx.ellipse(
             r * .35,
@@ -1986,7 +1641,6 @@ function drawBird(){
             Math.PI * 2
         );
 
-
         ctx.fill();
 
     }
@@ -1997,9 +1651,7 @@ function drawBird(){
     ctx.fillStyle =
         "white";
 
-
     ctx.beginPath();
-
 
     ctx.arc(
         r * .45,
@@ -2009,16 +1661,13 @@ function drawBird(){
         Math.PI * 2
     );
 
-
     ctx.fill();
 
 
     ctx.fillStyle =
         "#111";
 
-
     ctx.beginPath();
-
 
     ctx.arc(
         r * .52,
@@ -2028,7 +1677,6 @@ function drawBird(){
         Math.PI * 2
     );
 
-
     ctx.fill();
 
 
@@ -2037,180 +1685,28 @@ function drawBird(){
     ctx.fillStyle =
         "#ff8c00";
 
-
     ctx.beginPath();
-
 
     ctx.moveTo(
         r * .75,
         0
     );
 
-
     ctx.lineTo(
         r * 1.55,
         r * .2
     );
-
 
     ctx.lineTo(
         r * .75,
         r * .4
     );
 
-
     ctx.closePath();
 
-
     ctx.fill();
-
 
     ctx.restore();
-
-}
-
-
-/* =========================
-   DESENHAR FUNDO
-========================= */
-
-function drawBackground(){
-
-    const gradient =
-        ctx.createLinearGradient(
-            0,
-            0,
-            0,
-            H
-        );
-
-
-    gradient.addColorStop(
-        0,
-        "#58cce9"
-    );
-
-
-    gradient.addColorStop(
-        1,
-        "#c1f4ff"
-    );
-
-
-    ctx.fillStyle =
-        gradient;
-
-
-    ctx.fillRect(
-        0,
-        0,
-        W,
-        H
-    );
-
-
-    /* SOL */
-
-    ctx.fillStyle =
-        "#ffe46b";
-
-
-    ctx.beginPath();
-
-
-    ctx.arc(
-        W * .82,
-        H * .16,
-        38,
-        0,
-        Math.PI * 2
-    );
-
-
-    ctx.fill();
-
-
-    /* MONTANHAS */
-
-    ctx.fillStyle =
-        "#72b9c8";
-
-
-    ctx.beginPath();
-
-
-    ctx.moveTo(
-        0,
-        H - 55
-    );
-
-
-    ctx.lineTo(
-        W * .15,
-        H * .48
-    );
-
-
-    ctx.lineTo(
-        W * .30,
-        H - 55
-    );
-
-
-    ctx.lineTo(
-        W * .45,
-        H * .50
-    );
-
-
-    ctx.lineTo(
-        W * .62,
-        H - 55
-    );
-
-
-    ctx.lineTo(
-        W * .78,
-        H * .46
-    );
-
-
-    ctx.lineTo(
-        W,
-        H - 55
-    );
-
-
-    ctx.closePath();
-
-
-    ctx.fill();
-
-
-    /* CHÃO */
-
-    ctx.fillStyle =
-        "#72c94b";
-
-
-    ctx.fillRect(
-        0,
-        H - 55,
-        W,
-        55
-    );
-
-
-    ctx.fillStyle =
-        "#d9bd63";
-
-
-    ctx.fillRect(
-        0,
-        H - 55,
-        W,
-        8
-    );
 
 }
 
@@ -2226,7 +1722,7 @@ function draw(){
 
     for(
         const cloud
-        of clouds
+        of normalClouds
     ){
 
         drawNormalCloud(
@@ -2261,33 +1757,29 @@ function draw(){
 
 
     for(
-        const particle
+        const p
         of particles
     ){
 
         ctx.globalAlpha =
             Math.max(
                 0,
-                particle.life * 2
+                p.life * 2
             );
 
-
         ctx.fillStyle =
-            particle.color;
-
+            p.color;
 
         ctx.fillRect(
-            particle.x,
-            particle.y,
+            p.x,
+            p.y,
             5,
             5
         );
 
     }
 
-
     ctx.globalAlpha = 1;
-
 
     drawBird();
 
@@ -2300,25 +1792,17 @@ function draw(){
 
 function gameLoop(now){
 
-    if(!playing){
-
-        return;
-
-    }
-
+    if(!playing) return;
 
     const delta =
         (now - lastTime)
         / 1000;
 
-
     lastTime = now;
-
 
     update(delta);
 
     draw();
-
 
     if(playing){
 
@@ -2332,7 +1816,68 @@ function gameLoop(now){
 
 
 /* =========================
-   INÍCIO
+   GAME OVER
+========================= */
+
+function endGame(){
+
+    if(!playing) return;
+
+    playing = false;
+
+
+    if(score > bestScore){
+
+        bestScore = score;
+
+    }
+
+
+    totalCoins +=
+        runCoins;
+
+
+    save();
+
+
+    document.getElementById(
+        "finalScore"
+    ).textContent =
+        score;
+
+    document.getElementById(
+        "finalBest"
+    ).textContent =
+        bestScore;
+
+    document.getElementById(
+        "finalCoins"
+    ).textContent =
+        runCoins;
+
+
+    document.getElementById(
+        "score"
+    ).style.display =
+        "none";
+
+    document.getElementById(
+        "coinHud"
+    ).style.display =
+        "none";
+
+    document.getElementById(
+        "gameOver"
+    ).style.display =
+        "flex";
+
+    createSkins();
+
+}
+
+
+/* =========================
+   INICIAL
 ========================= */
 
 resetGame();
@@ -2342,4 +1887,4 @@ draw();
 </script>
 
 </body>
-    </html>
+      </html>
