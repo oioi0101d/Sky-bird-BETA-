@@ -4,191 +4,447 @@
 <meta charset="UTF-8">
 
 <meta name="viewport"
-content="width=device-width, initial-scale=1.0,
-maximum-scale=1.0, user-scalable=no">
+      content="width=device-width,
+      initial-scale=1.0,
+      maximum-scale=1.0,
+      user-scalable=no">
 
 <title>SKY BIRD</title>
 
 <style>
+
 *{
     box-sizing:border-box;
     margin:0;
     padding:0;
-    touch-action:manipulation;
 }
 
 html,body{
     width:100%;
     height:100%;
     overflow:hidden;
-    background:#111;
+    background:#70c5ce;
     font-family:Arial,sans-serif;
+    touch-action:none;
 }
 
-#game{
+canvas{
     position:fixed;
     inset:0;
-    width:100vw;
-    height:100vh;
+    width:100%;
+    height:100%;
     display:block;
-    background:#70c5ce;
 }
+
+/* =========================
+   TELA DEITADA
+========================= */
+
+#rotate{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:100;
+    background:#111;
+    color:white;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font:bold 25px Arial;
+    padding:30px;
+}
+
+@media (orientation:portrait){
+
+    #rotate{
+        display:flex;
+    }
+
+    #menu,
+    #gameOver,
+    #hud,
+    #coinHud{
+        visibility:hidden;
+    }
+
+}
+
+
+/* =========================
+   MENU
+========================= */
 
 #menu{
     position:fixed;
     inset:0;
     z-index:10;
+
     display:flex;
     flex-direction:column;
     justify-content:center;
     align-items:center;
-    background:linear-gradient(#58c8e8,#b9f2ff);
+
+    text-align:center;
+
+    background:
+        linear-gradient(
+            #58c8e8,
+            #b9f2ff
+        );
 }
 
 #menu h1{
-    font-size:clamp(40px,9vw,80px);
+    font-size:
+        clamp(45px,9vw,85px);
+
     color:white;
-    text-shadow:4px 4px #333;
+
+    text-shadow:
+        4px 4px #333;
+
     margin-bottom:8px;
 }
 
 #menu p{
     color:#333;
     font-weight:bold;
-    margin-bottom:15px;
+    margin:5px;
 }
+
+
+/* =========================
+   SKINS
+========================= */
 
 #skins{
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
     gap:8px;
+
     max-width:900px;
+
     padding:10px;
 }
 
 .skin{
-    min-width:125px;
+    min-width:120px;
+
     border:3px solid white;
     border-radius:12px;
+
     background:#222;
     color:white;
-    padding:10px 12px;
-    font-size:17px;
-    cursor:pointer;
-}
 
-.skin.locked{
-    opacity:.45;
+    padding:10px;
+
+    font-size:16px;
+    font-weight:bold;
 }
 
 .skin.selected{
     border-color:#ffe600;
-    box-shadow:0 0 15px #ffe600;
+
+    box-shadow:
+        0 0 15px #ffe600;
 }
 
-#start,#restart{
+.skin.locked{
+    opacity:.4;
+}
+
+
+/* =========================
+   BOTÕES
+========================= */
+
+.mainButton{
     margin-top:12px;
-    padding:14px 45px;
+
+    padding:14px 42px;
+
     border:0;
     border-radius:15px;
+
     background:#35b84a;
+
     color:white;
-    font-size:25px;
+
+    font-size:24px;
     font-weight:bold;
 }
 
-#score{
+
+/* =========================
+   HUD
+========================= */
+
+#hud{
     position:fixed;
-    top:15px;
-    left:50%;
-    transform:translateX(-50%);
+
     z-index:5;
-    color:white;
-    font-size:clamp(35px,7vw,65px);
-    font-weight:bold;
-    text-shadow:4px 4px #333;
+
+    top:12px;
+    left:50%;
+
+    transform:
+        translateX(-50%);
+
     display:none;
+
+    color:white;
+
+    font:bold 28px Arial;
+
+    text-shadow:
+        3px 3px #333;
 }
+
+#coinHud{
+    position:fixed;
+
+    z-index:5;
+
+    top:15px;
+    left:18px;
+
+    display:none;
+
+    color:white;
+
+    font:bold 20px Arial;
+
+    text-shadow:
+        2px 2px #333;
+}
+
+
+/* =========================
+   GAME OVER
+========================= */
 
 #gameOver{
     position:fixed;
+
     inset:0;
+
     z-index:20;
+
     display:none;
+
     flex-direction:column;
+
     justify-content:center;
     align-items:center;
-    background:rgba(0,0,0,.55);
+
+    text-align:center;
+
+    background:
+        rgba(0,0,0,.55);
+
     color:white;
 }
 
-#gameOver h2{
-    font-size:55px;
-    text-shadow:4px 4px #000;
+#gameOver h1{
+    font-size:
+        clamp(45px,8vw,75px);
+
+    color:white;
+
+    text-shadow:
+        4px 4px #000;
+
+    margin-bottom:15px;
 }
 
 #gameOver p{
-    font-size:25px;
-    margin:10px;
+    color:white;
+
+    font-size:22px;
+
+    margin:5px;
 }
 
-#restart{
-    margin-top:10px;
-}
 </style>
 </head>
 
+
 <body>
+
 
 <canvas id="game"></canvas>
 
-<div id="score">0</div>
+
+<!-- =========================
+     TELA DE CELULAR EM PÉ
+========================= -->
+
+<div id="rotate">
+
+    📱
+
+    <br><br>
+
+    Vire o celular de lado
+    para jogar!
+
+    <br><br>
+
+    <b>SKY BIRD</b>
+
+</div>
+
+
+<!-- =========================
+     HUD
+========================= -->
+
+<div id="hud">
+
+    Pontos:
+    <span id="score">0</span>
+
+</div>
+
+
+<div id="coinHud">
+
+    🪙
+    <span id="coins">0</span>
+
+</div>
+
+
+<!-- =========================
+     MENU
+========================= -->
 
 <div id="menu">
 
-    <h1>🐦 SKY BIRD</h1>
+    <h1>
+        🐦 SKY BIRD
+    </h1>
 
-    <p>Escolha seu pássaro</p>
+    <p>
+        Escolha seu pássaro
+    </p>
+
+    <p>
+
+        🏆 Recorde:
+        <span id="best">0</span>
+
+        &nbsp;&nbsp;
+
+        🪙
+        <span id="bank">0</span>
+
+    </p>
 
     <div id="skins"></div>
 
-    <button id="start">JOGAR</button>
+    <button
+        class="mainButton"
+        id="start">
+
+        JOGAR
+
+    </button>
 
 </div>
+
+
+<!-- =========================
+     GAME OVER
+========================= -->
 
 <div id="gameOver">
 
-    <h2>GAME OVER</h2>
+    <h1>
+        GAME OVER
+    </h1>
 
     <p>
+
         Pontuação:
         <span id="finalScore">0</span>
+
     </p>
 
     <p>
+
         Recorde:
-        <span id="bestFinal">0</span>
+        <span id="finalBest">0</span>
+
     </p>
 
-    <button id="restart">JOGAR NOVAMENTE</button>
+    <p>
+
+        🪙 Moedas:
+        <span id="finalCoins">0</span>
+
+    </p>
+
+    <button
+        class="mainButton"
+        id="restart">
+
+        JOGAR NOVAMENTE
+
+    </button>
+
+    <button
+        class="mainButton"
+        id="menuButton">
+
+        MENU
+
+    </button>
 
 </div>
 
+
 <script>
 
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
 
-const menu = document.getElementById("menu");
-const skinsBox = document.getElementById("skins");
-const startButton = document.getElementById("start");
+/* =========================
+   CANVAS
+========================= */
 
-const scoreText = document.getElementById("score");
-const gameOver = document.getElementById("gameOver");
-const finalScore = document.getElementById("finalScore");
-const bestFinal = document.getElementById("bestFinal");
-const restartButton = document.getElementById("restart");
+const canvas =
+    document.getElementById("game");
+
+const ctx =
+    canvas.getContext("2d");
+
+
+let W =
+    window.innerWidth;
+
+let H =
+    window.innerHeight;
+
+
+function resize(){
+
+    W =
+        canvas.width =
+        window.innerWidth;
+
+    H =
+        canvas.height =
+        window.innerHeight;
+
+}
+
+
+resize();
+
+
+window.addEventListener(
+    "resize",
+    resize
+);
 
 
 /* =========================
@@ -200,172 +456,285 @@ const skins = [
     {
         name:"🐦 Comum",
         unlock:0,
-        color:"#ffd21f"
+        color:"#ffd21f",
+        wing:"#e4a900"
     },
 
     {
         name:"🦸 Herói",
         unlock:100,
-        color:"#2878ff"
+        color:"#2878ff",
+        wing:"#164da8"
     },
 
     {
         name:"🔥 Fênix",
         unlock:300,
-        color:"#ff4b16"
+        color:"#ff4b16",
+        wing:"#c82c00"
     },
 
     {
         name:"🤖 Robô",
         unlock:500,
-        color:"#9da5ad"
+        color:"#9da5ad",
+        wing:"#626970"
     },
 
     {
         name:"👽 Alien",
         unlock:1000,
-        color:"#65ff50"
+        color:"#65ff50",
+        wing:"#25a928"
     },
 
     {
         name:"🌑 Sombrio",
         unlock:2000,
-        color:"#292333"
+        color:"#292333",
+        wing:"#15111c"
     }
 
 ];
 
-let bestScore =
-    Number(localStorage.getItem("skyBest") || 0);
-
-let selectedSkin =
-    Number(localStorage.getItem("skySkin") || 0);
-
-if(
-    selectedSkin < 0 ||
-    selectedSkin >= skins.length
-){
-    selectedSkin = 0;
-}
-
 
 /* =========================
-   TAMANHO
+   SAVE
 ========================= */
 
-let W = 0;
-let H = 0;
+let bestScore =
+    Number(
+        localStorage.getItem(
+            "skyBest"
+        ) || 0
+    );
 
-function resize(){
 
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
+let totalCoins =
+    Number(
+        localStorage.getItem(
+            "skyCoins"
+        ) || 0
+    );
+
+
+let selectedSkin =
+    Number(
+        localStorage.getItem(
+            "skySkin"
+        ) || 0
+    );
+
+
+if(
+    !skins[selectedSkin] ||
+    bestScore <
+    skins[selectedSkin].unlock
+){
+
+    selectedSkin = 0;
 
 }
 
-resize();
 
-window.addEventListener("resize",resize);
+function saveData(){
+
+    localStorage.setItem(
+        "skyBest",
+        bestScore
+    );
+
+    localStorage.setItem(
+        "skyCoins",
+        totalCoins
+    );
+
+    localStorage.setItem(
+        "skySkin",
+        selectedSkin
+    );
+
+}
 
 
 /* =========================
-   MENU DAS SKINS
+   ELEMENTOS
+========================= */
+
+const menu =
+    document.getElementById(
+        "menu"
+    );
+
+const gameOver =
+    document.getElementById(
+        "gameOver"
+    );
+
+const hud =
+    document.getElementById(
+        "hud"
+    );
+
+const coinHud =
+    document.getElementById(
+        "coinHud"
+    );
+
+const scoreText =
+    document.getElementById(
+        "score"
+    );
+
+const coinsText =
+    document.getElementById(
+        "coins"
+    );
+
+
+/* =========================
+   MENU DE SKINS
 ========================= */
 
 function createSkins(){
 
-    skinsBox.innerHTML = "";
+    const box =
+        document.getElementById(
+            "skins"
+        );
 
-    for(let i=0;i<skins.length;i++){
+    box.innerHTML = "";
 
-        const skin = skins[i];
 
-        const unlocked =
-            bestScore >= skin.unlock;
+    skins.forEach(
+        (skin,index)=>{
 
-        const button =
-            document.createElement("button");
-
-        button.className = "skin";
-
-        if(!unlocked){
-            button.classList.add("locked");
-        }
-
-        if(i === selectedSkin){
-            button.classList.add("selected");
-        }
-
-        if(unlocked){
-
-            button.textContent =
-                skin.name +
-                (skin.unlock > 0
-                ? " ✓"
-                : "");
-
-            button.onclick = function(){
-
-                selectedSkin = i;
-
-                localStorage.setItem(
-                    "skySkin",
-                    selectedSkin
+            const button =
+                document.createElement(
+                    "button"
                 );
 
-                createSkins();
 
-            };
-
-        }else{
-
-            button.textContent =
-                skin.name +
-                " 🔒 " +
+            const unlocked =
+                bestScore >=
                 skin.unlock;
 
-        }
 
-        skinsBox.appendChild(button);
-    }
+            button.className =
+                "skin";
+
+
+            if(
+                index ===
+                selectedSkin
+            ){
+
+                button.classList.add(
+                    "selected"
+                );
+
+            }
+
+
+            if(!unlocked){
+
+                button.classList.add(
+                    "locked"
+                );
+
+            }
+
+
+            if(unlocked){
+
+                button.textContent =
+                    skin.name +
+                    (
+                        index > 0
+                        ? " ✓"
+                        : ""
+                    );
+
+
+                button.onclick =
+                    function(){
+
+                        selectedSkin =
+                            index;
+
+                        saveData();
+
+                        createSkins();
+
+                    };
+
+            }
+            else{
+
+                button.textContent =
+                    skin.name +
+                    " 🔒 " +
+                    skin.unlock;
+
+            }
+
+
+            box.appendChild(
+                button
+            );
+
+        }
+    );
+
+
+    document.getElementById(
+        "best"
+    ).textContent =
+        bestScore;
+
+
+    document.getElementById(
+        "bank"
+    ).textContent =
+        totalCoins;
+
 }
+
 
 createSkins();
 
 
 /* =========================
-   JOGO
+   OBJETOS DO JOGO
 ========================= */
 
-let bird = {
-    x:0,
-    y:0,
-    velocity:0,
-    size:26
-};
+let bird;
 
-let pipes = [];
+let clouds = [];
+
+let fatalClouds = [];
+
+let coins = [];
+
+let particles = [];
+
 
 let score = 0;
+
+let runCoins = 0;
 
 let playing = false;
 
 let lastTime = 0;
 
-let pipeTimer = 0;
+let gameTime = 0;
 
 
-/*
-    FÍSICA
+let cloudTimer = 0;
 
-    A gravidade é aplicada por segundo,
-    então a velocidade não depende tanto
-    do FPS do celular.
-*/
+let fatalTimer = 0;
 
-const GRAVITY = 1150;
-
-const JUMP_FORCE = -390;
+let coinTimer = 0;
 
 
 /* =========================
@@ -374,25 +743,57 @@ const JUMP_FORCE = -390;
 
 function resetGame(){
 
-    bird.x = W * 0.25;
+    bird = {
 
-    bird.y = H * 0.45;
+        x:
+            W * 0.23,
 
-    bird.velocity = 0;
+        y:
+            H * 0.45,
 
-    bird.size =
-        Math.max(
-            22,
-            Math.min(W,H) * 0.055
-        );
+        velocity:0,
 
-    pipes = [];
+        radius:
+            Math.max(
+                22,
+                Math.min(W,H)
+                * 0.055
+            ),
+
+        rotation:0
+
+    };
+
+
+    clouds = [];
+
+    fatalClouds = [];
+
+    coins = [];
+
+    particles = [];
+
 
     score = 0;
 
-    pipeTimer = 0;
+    runCoins = 0;
 
-    scoreText.textContent = "0";
+    gameTime = 0;
+
+
+    cloudTimer = 0.2;
+
+    fatalTimer = 2;
+
+    coinTimer = 0.8;
+
+
+    scoreText.textContent =
+        "0";
+
+
+    coinsText.textContent =
+        "0";
 
 }
 
@@ -405,17 +806,28 @@ function startGame(){
 
     resetGame();
 
-    menu.style.display = "none";
+    menu.style.display =
+        "none";
 
-    gameOver.style.display = "none";
+    gameOver.style.display =
+        "none";
 
-    scoreText.style.display = "block";
+    hud.style.display =
+        "block";
+
+    coinHud.style.display =
+        "block";
+
 
     playing = true;
 
-    lastTime = performance.now();
+    lastTime =
+        performance.now();
 
-    requestAnimationFrame(gameLoop);
+
+    requestAnimationFrame(
+        gameLoop
+    );
 
 }
 
@@ -426,38 +838,56 @@ function startGame(){
 
 function flap(){
 
-    if(!playing) return;
+    if(!playing){
 
-    bird.velocity = JUMP_FORCE;
+        return;
+
+    }
+
+
+    bird.velocity =
+        -390;
+
+    bird.rotation =
+        -0.5;
+
+
+    createParticles(
+        bird.x - 10,
+        bird.y + 10,
+        5,
+        "#ffffff"
+    );
 
 }
 
 
 /* =========================
-   CONTROLE
+   CONTROLES
 ========================= */
 
 canvas.addEventListener(
     "pointerdown",
-    function(e){
+    function(event){
 
-        e.preventDefault();
+        event.preventDefault();
 
         flap();
 
     }
 );
 
+
 document.addEventListener(
     "keydown",
-    function(e){
+    function(event){
 
         if(
-            e.code === "Space" ||
-            e.code === "ArrowUp"
+            event.code === "Space" ||
+            event.code === "ArrowUp"
         ){
 
-            e.preventDefault();
+            event.preventDefault();
 
             flap();
 
@@ -466,51 +896,177 @@ document.addEventListener(
     }
 );
 
-startButton.onclick = startGame;
 
-restartButton.onclick = startGame;
+document.getElementById(
+    "start"
+).onclick =
+    startGame;
+
+
+document.getElementById(
+    "restart"
+).onclick =
+    startGame;
+
+
+document.getElementById(
+    "menuButton"
+).onclick =
+    function(){
+
+        playing = false;
+
+        gameOver.style.display =
+            "none";
+
+        menu.style.display =
+            "flex";
+
+        createSkins();
+
+        resetGame();
+
+        draw();
+
+    };
 
 
 /* =========================
-   CANOS
+   PARTÍCULAS
 ========================= */
 
-function createPipe(){
+function createParticles(
+    x,
+    y,
+    amount,
+    color
+){
 
-    const gap =
-        Math.max(
-            145,
-            H * 0.25
-        );
+    for(
+        let i=0;
+        i<amount;
+        i++
+    ){
 
-    const minTop = 50;
+        particles.push({
 
-    const minBottom = 50;
+            x:x,
 
-    const available =
-        H - gap -
-        minTop -
-        minBottom;
+            y:y,
 
-    const top =
-        minTop +
-        Math.random() * available;
+            velocityX:
+                (
+                    Math.random()
+                    -0.5
+                ) * 150,
 
-    pipes.push({
+            velocityY:
+                (
+                    Math.random()
+                    -0.5
+                ) * 150,
 
-        x:W + 50,
+            life:
+                0.4 +
+                Math.random()
+                * 0.4,
 
-        width:
-            Math.max(
-                55,
-                W * 0.075
-            ),
+            color:color
 
-        top:top,
+        });
 
-        gap:gap,
+    }
 
-        passed:false
+}
+
+
+/* =========================
+   NUVEM NORMAL
+========================= */
+
+function createCloud(){
+
+    clouds.push({
+
+        x:
+            W + 120,
+
+        y:
+            60 +
+            Math.random()
+            * H * 0.58,
+
+        scale:
+            0.7 +
+            Math.random()
+            * 0.6,
+
+        speed:
+            55 +
+            Math.random()
+            * 35
+
+    });
+
+}
+
+
+/* =========================
+   NUVEM FATAL
+========================= */
+
+function createFatalCloud(){
+
+    fatalClouds.push({
+
+        x:
+            W + 120,
+
+        y:
+            80 +
+            Math.random()
+            * H * 0.55,
+
+        scale:
+            0.8 +
+            Math.random()
+            * 0.35,
+
+        speed:
+            90 +
+            Math.random()
+            * 40,
+
+        phase:
+            Math.random()
+            * Math.PI * 2
+
+    });
+
+}
+
+
+/* =========================
+   MOEDA
+========================= */
+
+function createCoin(){
+
+    coins.push({
+
+        x:
+            W + 50,
+
+        y:
+            80 +
+            Math.random()
+            * H * 0.62,
+
+        radius:15,
+
+        rotation:
+            Math.random()
+            * Math.PI * 2
 
     });
 
@@ -523,143 +1079,249 @@ function createPipe(){
 
 function update(delta){
 
-    /*
-       Limita o delta para evitar
-       bugs quando o celular trava.
-    */
-
     delta =
-        Math.min(delta,0.035);
+        Math.min(
+            delta,
+            0.035
+        );
+
+
+    gameTime += delta;
 
 
     /* GRAVIDADE */
 
     bird.velocity +=
-        GRAVITY * delta;
+        1150 * delta;
 
     bird.y +=
         bird.velocity * delta;
 
 
-    /* CANOS */
+    bird.rotation +=
+        1.8 * delta;
 
-    const pipeSpeed =
-        Math.max(
-            180,
-            W * 0.32
-        );
-
-    pipeTimer += delta;
-
-    if(pipeTimer >= 1.55){
-
-        pipeTimer = 0;
-
-        createPipe();
-
-    }
-
-
-    for(let i=pipes.length-1;i>=0;i--){
-
-        const pipe = pipes[i];
-
-        pipe.x -=
-            pipeSpeed * delta;
-
-
-        /*
-           Pontuação
-        */
-
-        if(
-            !pipe.passed &&
-            pipe.x + pipe.width < bird.x
-        ){
-
-            pipe.passed = true;
-
-            score++;
-
-            scoreText.textContent =
-                score;
-
-            if(score > bestScore){
-
-                bestScore = score;
-
-                localStorage.setItem(
-                    "skyBest",
-                    bestScore
-                );
-
-            }
-
-        }
-
-
-        if(
-            pipe.x + pipe.width < -50
-        ){
-
-            pipes.splice(i,1);
-
-        }
-
-    }
-
-
-    /* COLISÃO COM TELA */
 
     if(
-        bird.y - bird.size < 0 ||
-        bird.y + bird.size > H
+        bird.rotation > 1
     ){
 
-        endGame();
-
-        return;
+        bird.rotation = 1;
 
     }
 
 
-    /* COLISÃO COM CANOS */
+    /* TIMERS */
 
-    for(const pipe of pipes){
+    cloudTimer -= delta;
 
-        const birdLeft =
-            bird.x - bird.size * 0.75;
+    fatalTimer -= delta;
 
-        const birdRight =
-            bird.x + bird.size * 0.75;
-
-        const birdTop =
-            bird.y - bird.size * 0.75;
-
-        const birdBottom =
-            bird.y + bird.size * 0.75;
+    coinTimer -= delta;
 
 
-        const pipeLeft =
-            pipe.x;
+    if(
+        cloudTimer <= 0
+    ){
 
-        const pipeRight =
-            pipe.x + pipe.width;
+        createCloud();
 
-        const bottomPipeTop =
-            pipe.top + pipe.gap;
+        cloudTimer =
+            1 +
+            Math.random()
+            * 1.4;
 
-
-        const hitX =
-            birdRight > pipeLeft &&
-            birdLeft < pipeRight;
-
-        const hitY =
-            birdTop < pipe.top ||
-            birdBottom > bottomPipeTop;
+    }
 
 
-        if(hitX && hitY){
+    if(
+        coinTimer <= 0
+    ){
+
+        createCoin();
+
+        coinTimer =
+            0.75 +
+            Math.random()
+            * 1.1;
+
+    }
+
+
+    const difficulty =
+        Math.min(
+            2.2,
+            1 +
+            score / 30
+        );
+
+
+    if(
+        fatalTimer <= 0
+    ){
+
+        createFatalCloud();
+
+        fatalTimer =
+            Math.max(
+                1.3,
+                2.8 /
+                difficulty
+            ) +
+            Math.random()
+            * 1.5;
+
+    }
+
+
+    /* =========================
+       MOVIMENTO NUVENS
+    ========================= */
+
+    for(
+        const cloud of clouds
+    ){
+
+        cloud.x -=
+            cloud.speed *
+            delta *
+            difficulty;
+
+    }
+
+
+    for(
+        const cloud of fatalClouds
+    ){
+
+        cloud.x -=
+            cloud.speed *
+            delta *
+            difficulty;
+
+        cloud.phase +=
+            5 * delta;
+
+    }
+
+
+    /* =========================
+       MOEDAS
+    ========================= */
+
+    for(
+        const coin of coins
+    ){
+
+        coin.x -=
+            190 *
+            delta *
+            difficulty;
+
+        coin.rotation +=
+            6 * delta;
+
+    }
+
+
+    /* =========================
+       PEGAR MOEDAS
+    ========================= */
+
+    for(
+        let i =
+            coins.length - 1;
+        i >= 0;
+        i--
+    ){
+
+        const coin =
+            coins[i];
+
+
+        const distance =
+            Math.hypot(
+                bird.x -
+                coin.x,
+
+                bird.y -
+                coin.y
+            );
+
+
+        if(
+            distance <
+            bird.radius +
+            coin.radius
+        ){
+
+            runCoins++;
+
+
+            coinsText.textContent =
+                runCoins;
+
+
+            createParticles(
+                coin.x,
+                coin.y,
+                12,
+                "#ffd21f"
+            );
+
+
+            coins.splice(
+                i,
+                1
+            );
+
+        }
+        else if(
+            coin.x < -60
+        ){
+
+            coins.splice(
+                i,
+                1
+            );
+
+        }
+
+    }
+
+
+    /* =========================
+       NUVENS FATAIS
+    ========================= */
+
+    for(
+        const cloud
+        of fatalClouds
+    ){
+
+        const distance =
+            Math.hypot(
+                bird.x -
+                cloud.x,
+
+                bird.y -
+                cloud.y
+            );
+
+
+        if(
+            distance <
+            bird.radius +
+            42 *
+            cloud.scale
+        ){
+
+            createParticles(
+                bird.x,
+                bird.y,
+                25,
+                "#ff3030"
+            );
 
             endGame();
 
@@ -669,129 +1331,413 @@ function update(delta){
 
     }
 
+
+    /* LIMPEZA */
+
+    clouds =
+        clouds.filter(
+            cloud =>
+                cloud.x > -180
+        );
+
+
+    fatalClouds =
+        fatalClouds.filter(
+            cloud =>
+                cloud.x > -180
+        );
+
+
+    /* =========================
+       PARTÍCULAS
+    ========================= */
+
+    for(
+        let i =
+            particles.length - 1;
+        i >= 0;
+        i--
+    ){
+
+        const particle =
+            particles[i];
+
+
+        particle.x +=
+            particle.velocityX *
+            delta;
+
+        particle.y +=
+            particle.velocityY *
+            delta;
+
+        particle.life -=
+            delta;
+
+
+        if(
+            particle.life <= 0
+        ){
+
+            particles.splice(
+                i,
+                1
+            );
+
+        }
+
+    }
+
+
+    /* =========================
+       BORDA DA TELA
+    ========================= */
+
+    if(
+        bird.y -
+        bird.radius < 0
+    ){
+
+        endGame();
+
+        return;
+
+    }
+
+
+    if(
+        bird.y +
+        bird.radius >
+        H - 55
+    ){
+
+        endGame();
+
+        return;
+
+    }
+
+
+    /* =========================
+       PONTUAÇÃO
+    ========================= */
+
+    score =
+        Math.floor(
+            gameTime * 5
+        );
+
+
+    scoreText.textContent =
+        score;
+
 }
 
 
 /* =========================
-   DESENHAR FUNDO
+   DESENHAR NUVEM NORMAL
 ========================= */
 
-function drawBackground(){
+function drawNormalCloud(
+    cloud
+){
 
-    ctx.fillStyle = "#70c5ce";
+    ctx.save();
 
-    ctx.fillRect(
-        0,
-        0,
-        W,
-        H
+
+    ctx.translate(
+        cloud.x,
+        cloud.y
     );
 
 
-    /* nuvens */
+    ctx.scale(
+        cloud.scale,
+        cloud.scale
+    );
+
 
     ctx.fillStyle =
-        "rgba(255,255,255,.75)";
+        "rgba(255,255,255,.85)";
 
-    for(let i=0;i<5;i++){
 
-        const x =
-            (i * W * 0.27 + 80) % (W+150);
+    ctx.beginPath();
 
-        const y =
-            50 + (i%3)*65;
 
-        ctx.beginPath();
+    ctx.arc(
+        -40,
+        8,
+        25,
+        0,
+        Math.PI * 2
+    );
 
-        ctx.arc(
-            x,
-            y,
-            25,
-            0,
-            Math.PI*2
-        );
 
-        ctx.arc(
-            x+30,
-            y-12,
-            32,
-            0,
-            Math.PI*2
-        );
+    ctx.arc(
+        -12,
+        -8,
+        34,
+        0,
+        Math.PI * 2
+    );
 
-        ctx.arc(
-            x+65,
-            y,
-            25,
-            0,
-            Math.PI*2
-        );
 
-        ctx.fill();
+    ctx.arc(
+        22,
+        4,
+        29,
+        0,
+        Math.PI * 2
+    );
 
-    }
+
+    ctx.arc(
+        48,
+        13,
+        20,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.fill();
+
+
+    ctx.restore();
 
 }
 
 
 /* =========================
-   DESENHAR CANOS
+   DESENHAR NUVEM FATAL
 ========================= */
 
-function drawPipes(){
+function drawFatalCloud(
+    cloud
+){
 
-    for(const pipe of pipes){
-
-        const bottomY =
-            pipe.top + pipe.gap;
+    ctx.save();
 
 
-        /* tubo de cima */
+    ctx.translate(
+        cloud.x,
+        cloud.y
+    );
 
-        ctx.fillStyle = "#32b532";
 
-        ctx.fillRect(
-            pipe.x,
-            0,
-            pipe.width,
-            pipe.top
+    ctx.scale(
+        cloud.scale,
+        cloud.scale
+    );
+
+
+    ctx.translate(
+        0,
+        Math.sin(
+            cloud.phase
+        ) * 3
+    );
+
+
+    /* NUVEM */
+
+    ctx.fillStyle =
+        "#555b66";
+
+    ctx.strokeStyle =
+        "#30343b";
+
+    ctx.lineWidth = 5;
+
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+        -42,
+        8,
+        28,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.arc(
+        -15,
+        -10,
+        38,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.arc(
+        20,
+        4,
+        32,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.arc(
+        48,
+        14,
+        22,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.fill();
+
+    ctx.stroke();
+
+
+    /* OLHOS */
+
+    ctx.fillStyle =
+        "#ff3030";
+
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+        -17,
+        4,
+        6,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.arc(
+        23,
+        4,
+        6,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.fill();
+
+
+    /* BOCA */
+
+    ctx.strokeStyle =
+        "#ff3030";
+
+    ctx.lineWidth = 5;
+
+
+    ctx.beginPath();
+
+
+    ctx.moveTo(
+        -22,
+        22
+    );
+
+
+    ctx.quadraticCurveTo(
+        2,
+        38,
+        28,
+        21
+    );
+
+
+    ctx.stroke();
+
+
+    ctx.restore();
+
+}
+
+
+/* =========================
+   DESENHAR MOEDA
+========================= */
+
+function drawCoin(
+    coin
+){
+
+    ctx.save();
+
+
+    ctx.translate(
+        coin.x,
+        coin.y
+    );
+
+
+    const scale =
+        Math.max(
+            0.2,
+            Math.abs(
+                Math.cos(
+                    coin.rotation
+                )
+            )
         );
 
 
-        /* borda */
-
-        ctx.fillStyle = "#238523";
-
-        ctx.fillRect(
-            pipe.x,
-            pipe.top - 15,
-            pipe.width,
-            15
-        );
+    ctx.scale(
+        scale,
+        1
+    );
 
 
-        /* tubo de baixo */
+    ctx.fillStyle =
+        "#ffd21f";
 
-        ctx.fillStyle = "#32b532";
+    ctx.strokeStyle =
+        "#c98b00";
 
-        ctx.fillRect(
-            pipe.x,
-            bottomY,
-            pipe.width,
-            H-bottomY
-        );
+    ctx.lineWidth = 3;
 
 
-        ctx.fillStyle = "#238523";
+    ctx.beginPath();
 
-        ctx.fillRect(
-            pipe.x,
-            bottomY,
-            pipe.width,
-            15
-        );
 
-    }
+    ctx.arc(
+        0,
+        0,
+        coin.radius,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.fill();
+
+    ctx.stroke();
+
+
+    ctx.fillStyle =
+        "#fff1a0";
+
+    ctx.font =
+        "bold 15px Arial";
+
+    ctx.textAlign =
+        "center";
+
+    ctx.textBaseline =
+        "middle";
+
+
+    ctx.fillText(
+        "$",
+        0,
+        1
+    );
+
+
+    ctx.restore();
 
 }
 
@@ -806,60 +1752,89 @@ function drawBird(){
         skins[selectedSkin];
 
 
-    const x = bird.x;
-    const y = bird.y;
-    const r = bird.size;
+    const x =
+        bird.x;
+
+    const y =
+        bird.y;
+
+    const r =
+        bird.radius;
 
 
     ctx.save();
 
-    /*
-       Rotação conforme velocidade.
-    */
 
-    const angle =
-        Math.max(
-            -0.5,
-            Math.min(
-                1.0,
-                bird.velocity / 600
-            )
-        );
-
-    ctx.translate(x,y);
-
-    ctx.rotate(angle);
+    ctx.translate(
+        x,
+        y
+    );
 
 
-    /* =====================
-       FÊNIX
-    ===================== */
+    ctx.rotate(
+        bird.rotation
+    );
 
-    if(selectedSkin === 2){
 
-        ctx.fillStyle = "#ff7a00";
+    /* FÊNIX */
+
+    if(
+        selectedSkin === 2
+    ){
+
+        ctx.fillStyle =
+            "#ff7a00";
+
 
         ctx.beginPath();
 
-        ctx.moveTo(-r*1.4,r*.8);
-        ctx.lineTo(-r*2,r*1.6);
-        ctx.lineTo(-r*1.1,r*.2);
-        ctx.lineTo(-r*1.7,-r*.8);
-        ctx.lineTo(-r*.4,-r*.3);
+
+        ctx.moveTo(
+            -r * .5,
+            r * .3
+        );
+
+
+        ctx.lineTo(
+            -r * 1.8,
+            r * 1.3
+        );
+
+
+        ctx.lineTo(
+            -r * 1.1,
+            0
+        );
+
+
+        ctx.lineTo(
+            -r * 1.8,
+            -r
+        );
+
+
+        ctx.lineTo(
+            -r * .3,
+            -r * .2
+        );
+
 
         ctx.fill();
 
     }
 
 
-    /* =====================
-       SOMBRIO
-    ===================== */
+    /* SOMBRIO */
 
-    if(selectedSkin === 5){
+    if(
+        selectedSkin === 5
+    ){
 
-        ctx.shadowColor = "#7b4dff";
-        ctx.shadowBlur = 18;
+        ctx.shadowColor =
+            "#8b55ff";
+
+        ctx.shadowBlur =
+            18;
 
     }
 
@@ -869,17 +1844,21 @@ function drawBird(){
     ctx.fillStyle =
         skin.color;
 
+
     ctx.beginPath();
+
 
     ctx.arc(
         0,
         0,
         r,
         0,
-        Math.PI*2
+        Math.PI * 2
     );
 
+
     ctx.fill();
+
 
     ctx.shadowBlur = 0;
 
@@ -887,106 +1866,126 @@ function drawBird(){
     /* ASA */
 
     ctx.fillStyle =
-        selectedSkin === 3
-        ? "#626970"
-        : "#e5aa00";
+        skin.wing;
+
 
     ctx.beginPath();
 
+
     ctx.ellipse(
-        -r*.3,
-        r*.35,
-        r*.75,
-        r*.38,
+        -r * .3,
+        r * .35,
+        r * .75,
+        r * .38,
         -.3,
         0,
-        Math.PI*2
+        Math.PI * 2
     );
+
 
     ctx.fill();
 
 
-    /* =====================
-       ROBÔ
-    ===================== */
+    /* HERÓI */
 
-    if(selectedSkin === 3){
+    if(
+        selectedSkin === 1
+    ){
 
-        ctx.strokeStyle = "#333";
+        ctx.fillStyle =
+            "#e21b23";
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            -r * .2,
+            r * .2
+        );
+
+
+        ctx.lineTo(
+            -r * 1.7,
+            r * 1.25
+        );
+
+
+        ctx.lineTo(
+            -r * 1.05,
+            0
+        );
+
+
+        ctx.fill();
+
+    }
+
+
+    /* ROBÔ */
+
+    if(
+        selectedSkin === 3
+    ){
+
+        ctx.strokeStyle =
+            "#333";
 
         ctx.lineWidth = 3;
 
+
         ctx.strokeRect(
-            -r*.65,
-            -r*.65,
-            r*1.3,
-            r*1.3
+            -r * .65,
+            -r * .65,
+            r * 1.3,
+            r * 1.3
         );
 
-        ctx.fillStyle = "#ff3333";
+
+        ctx.fillStyle =
+            "#ff3333";
+
 
         ctx.beginPath();
+
 
         ctx.arc(
-            r*.35,
-            -r*.2,
-            r*.12,
+            r * .35,
+            -r * .2,
+            r * .12,
             0,
-            Math.PI*2
+            Math.PI * 2
         );
+
 
         ctx.fill();
 
     }
 
 
-    /* =====================
-       ALIEN
-    ===================== */
+    /* ALIEN */
 
-    if(selectedSkin === 4){
+    if(
+        selectedSkin === 4
+    ){
 
-        ctx.fillStyle = "#111";
+        ctx.fillStyle =
+            "#111";
+
 
         ctx.beginPath();
+
 
         ctx.ellipse(
-            r*.35,
-            -r*.2,
-            r*.22,
-            r*.35,
+            r * .35,
+            -r * .2,
+            r * .22,
+            r * .35,
             -.3,
             0,
-            Math.PI*2
+            Math.PI * 2
         );
 
-        ctx.fill();
-
-    }
-
-
-    /* CAPA DO HERÓI */
-
-    if(selectedSkin === 1){
-
-        ctx.fillStyle = "#e21b23";
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            -r*.3,
-            r*.3
-        );
-
-        ctx.lineTo(
-            -r*1.7,
-            r*1.3
-        );
-
-        ctx.lineTo(
-            -r*1.1,
-            r*.1
-        );
 
         ctx.fill();
 
@@ -995,32 +1994,40 @@ function drawBird(){
 
     /* OLHO */
 
-    ctx.fillStyle = "white";
+    ctx.fillStyle =
+        "white";
+
 
     ctx.beginPath();
 
+
     ctx.arc(
-        r*.45,
-        -r*.3,
-        r*.28,
+        r * .45,
+        -r * .3,
+        r * .28,
         0,
-        Math.PI*2
+        Math.PI * 2
     );
+
 
     ctx.fill();
 
 
-    ctx.fillStyle = "black";
+    ctx.fillStyle =
+        "#111";
+
 
     ctx.beginPath();
 
+
     ctx.arc(
-        r*.52,
-        -r*.3,
-        r*.12,
+        r * .52,
+        -r * .3,
+        r * .12,
         0,
-        Math.PI*2
+        Math.PI * 2
     );
+
 
     ctx.fill();
 
@@ -1030,29 +2037,180 @@ function drawBird(){
     ctx.fillStyle =
         "#ff8c00";
 
+
     ctx.beginPath();
 
+
     ctx.moveTo(
-        r*.75,
+        r * .75,
         0
     );
 
-    ctx.lineTo(
-        r*1.55,
-        r*.2
-    );
 
     ctx.lineTo(
-        r*.75,
-        r*.4
+        r * 1.55,
+        r * .2
     );
+
+
+    ctx.lineTo(
+        r * .75,
+        r * .4
+    );
+
 
     ctx.closePath();
+
 
     ctx.fill();
 
 
     ctx.restore();
+
+}
+
+
+/* =========================
+   DESENHAR FUNDO
+========================= */
+
+function drawBackground(){
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            0,
+            H
+        );
+
+
+    gradient.addColorStop(
+        0,
+        "#58cce9"
+    );
+
+
+    gradient.addColorStop(
+        1,
+        "#c1f4ff"
+    );
+
+
+    ctx.fillStyle =
+        gradient;
+
+
+    ctx.fillRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    /* SOL */
+
+    ctx.fillStyle =
+        "#ffe46b";
+
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+        W * .82,
+        H * .16,
+        38,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.fill();
+
+
+    /* MONTANHAS */
+
+    ctx.fillStyle =
+        "#72b9c8";
+
+
+    ctx.beginPath();
+
+
+    ctx.moveTo(
+        0,
+        H - 55
+    );
+
+
+    ctx.lineTo(
+        W * .15,
+        H * .48
+    );
+
+
+    ctx.lineTo(
+        W * .30,
+        H - 55
+    );
+
+
+    ctx.lineTo(
+        W * .45,
+        H * .50
+    );
+
+
+    ctx.lineTo(
+        W * .62,
+        H - 55
+    );
+
+
+    ctx.lineTo(
+        W * .78,
+        H * .46
+    );
+
+
+    ctx.lineTo(
+        W,
+        H - 55
+    );
+
+
+    ctx.closePath();
+
+
+    ctx.fill();
+
+
+    /* CHÃO */
+
+    ctx.fillStyle =
+        "#72c94b";
+
+
+    ctx.fillRect(
+        0,
+        H - 55,
+        W,
+        55
+    );
+
+
+    ctx.fillStyle =
+        "#d9bd63";
+
+
+    ctx.fillRect(
+        0,
+        H - 55,
+        W,
+        8
+    );
 
 }
 
@@ -1065,7 +2223,71 @@ function draw(){
 
     drawBackground();
 
-    drawPipes();
+
+    for(
+        const cloud
+        of clouds
+    ){
+
+        drawNormalCloud(
+            cloud
+        );
+
+    }
+
+
+    for(
+        const cloud
+        of fatalClouds
+    ){
+
+        drawFatalCloud(
+            cloud
+        );
+
+    }
+
+
+    for(
+        const coin
+        of coins
+    ){
+
+        drawCoin(
+            coin
+        );
+
+    }
+
+
+    for(
+        const particle
+        of particles
+    ){
+
+        ctx.globalAlpha =
+            Math.max(
+                0,
+                particle.life * 2
+            );
+
+
+        ctx.fillStyle =
+            particle.color;
+
+
+        ctx.fillRect(
+            particle.x,
+            particle.y,
+            5,
+            5
+        );
+
+    }
+
+
+    ctx.globalAlpha = 1;
+
 
     drawBird();
 
@@ -1078,11 +2300,17 @@ function draw(){
 
 function gameLoop(now){
 
-    if(!playing) return;
+    if(!playing){
+
+        return;
+
+    }
 
 
     const delta =
-        (now-lastTime)/1000;
+        (now - lastTime)
+        / 1000;
+
 
     lastTime = now;
 
@@ -1104,41 +2332,14 @@ function gameLoop(now){
 
 
 /* =========================
-   GAME OVER
+   INÍCIO
 ========================= */
 
-function endGame(){
+resetGame();
 
-    if(!playing) return;
-
-    playing = false;
-
-    finalScore.textContent =
-        score;
-
-    bestFinal.textContent =
-        bestScore;
-
-    scoreText.style.display =
-        "none";
-
-    gameOver.style.display =
-        "flex";
-
-    createSkins();
-
-}
-
-
-/* =========================
-   INICIAL
-========================= */
-
-drawBackground();
-
-drawBird();
+draw();
 
 </script>
 
 </body>
-</html>
+    </html>
