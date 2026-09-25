@@ -1,7 +1,9 @@
 <!DOCTYPE html><html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta charset="UTF-8"><meta name="viewport"
+content="width=device-width, initial-scale=1.0,
+maximum-scale=1.0, user-scalable=no">
+
 <title>SKY BIRD</title><style>
 *{
     box-sizing:border-box;
@@ -14,15 +16,15 @@ html,body{
     width:100%;
     height:100%;
     overflow:hidden;
-    font-family:Arial,sans-serif;
     background:#70c5ce;
+    font-family:Arial,sans-serif;
 }
 
 #game{
     position:fixed;
     inset:0;
-    width:100%;
-    height:100%;
+    width:100vw;
+    height:100vh;
     display:block;
 }
 
@@ -34,14 +36,13 @@ html,body{
     flex-direction:column;
     justify-content:center;
     align-items:center;
-    overflow:auto;
-    padding:15px;
     background:linear-gradient(#58c8e8,#b9f2ff);
+    overflow-y:auto;
 }
 
 #menu h1{
     color:white;
-    font-size:clamp(42px,9vw,80px);
+    font-size:clamp(45px,9vw,80px);
     text-shadow:4px 4px #333;
     margin-bottom:5px;
 }
@@ -49,7 +50,7 @@ html,body{
 #menu p{
     color:#333;
     font-weight:bold;
-    margin:4px;
+    margin:5px;
 }
 
 #skins{
@@ -58,8 +59,8 @@ html,body{
     justify-content:center;
     align-items:center;
     gap:8px;
-    width:min(900px,95vw);
-    margin:10px 0;
+    max-width:950px;
+    padding:12px;
 }
 
 .skin{
@@ -80,11 +81,11 @@ html,body{
 }
 
 .skin.locked{
-    opacity:.45;
+    opacity:.4;
 }
 
 .button{
-    margin-top:10px;
+    margin-top:12px;
     padding:14px 42px;
     border:0;
     border-radius:15px;
@@ -92,26 +93,27 @@ html,body{
     color:white;
     font-size:24px;
     font-weight:bold;
+    cursor:pointer;
 }
 
 #score{
     position:fixed;
+    z-index:5;
     top:12px;
     left:50%;
     transform:translateX(-50%);
-    z-index:5;
     display:none;
     color:white;
-    font-size:55px;
+    font-size:clamp(30px,5vw,55px);
     font-weight:bold;
     text-shadow:4px 4px #333;
 }
 
 #coinHud{
     position:fixed;
+    z-index:5;
     top:18px;
     left:20px;
-    z-index:5;
     display:none;
     color:white;
     font-size:22px;
@@ -129,7 +131,6 @@ html,body{
     align-items:center;
     background:rgba(0,0,0,.6);
     color:white;
-    text-align:center;
 }
 
 #gameOver h2{
@@ -190,98 +191,132 @@ html,body{
 
 </div><script>
 
-const canvas=document.getElementById("game");
-const ctx=canvas.getContext("2d");
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-let W=0,H=0;
+let W = 0;
+let H = 0;
 
 function resize(){
-    W=canvas.width=window.innerWidth;
-    H=canvas.height=window.innerHeight;
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
 }
 
 resize();
-window.addEventListener("resize",resize);
+window.addEventListener("resize", resize);
 
 
 /* =========================
    SKINS
 ========================= */
 
-const skins=[
+const skins = [
 
-{
-    name:"🐦 Comum",
-    unlock:0,
-    body:"#ffd21f",
-    wing:"#e5aa00",
-    head:"none"
-},
+    {
+        name:"🐦 Comum",
+        unlock:0,
+        body:"#ffd21f",
+        wing:"#e5aa00",
+        type:"normal"
+    },
 
-{
-    name:"🦸 Herói",
-    unlock:10,
-    body:"#2878ff",
-    wing:"#1652b5",
-    head:"hero"
-},
+    {
+        name:"🦸 Herói",
+        unlock:100,
+        body:"#2878ff",
+        wing:"#1652b5",
+        type:"hero"
+    },
 
-{
-    name:"🔥 Fênix",
-    unlock:30,
-    body:"#ff4b16",
-    wing:"#c83200",
-    head:"fire"
-},
+    {
+        name:"🔥 Fênix",
+        unlock:300,
+        body:"#ff4b16",
+        wing:"#c83200",
+        type:"phoenix"
+    },
 
-{
-    name:"🤖 Robô",
-    unlock:50,
-    body:"#9da5ad",
-    wing:"#626970",
-    head:"robot"
-},
+    {
+        name:"🤖 Robô",
+        unlock:500,
+        body:"#9da5ad",
+        wing:"#626970",
+        type:"robot"
+    },
 
-{
-    name:"👽 Alien",
-    unlock:100,
-    body:"#65ff50",
-    wing:"#269e28",
-    head:"alien"
-},
+    {
+        name:"👽 Alien",
+        unlock:1000,
+        body:"#65ff50",
+        wing:"#269e28",
+        type:"alien"
+    },
 
-{
-    name:"🌑 Sombrio",
-    unlock:200,
-    body:"#292333",
-    wing:"#15111c",
-    head:"dark"
-},
+    {
+        name:"🌑 Sombrio",
+        unlock:2000,
+        body:"#292333",
+        wing:"#15111c",
+        type:"dark"
+    },
 
-{
-    name:"🍩 Rosquinha",
-    unlock:300,
-    body:"#ffcf91",
-    wing:"#d88b45",
-    head:"donut"
-},
+    {
+        name:"🍩 Rosquinha",
+        unlock:2500,
+        body:"#ffd21f",
+        wing:"#e5aa00",
+        type:"donut"
+    },
 
-{
-    name:"🧇 Waffle",
-    unlock:500,
-    body:"#f5c45b",
-    wing:"#bd8024",
-    head:"waffle"
-}
+    {
+        name:"🧇 Waffle",
+        unlock:3000,
+        body:"#d99a3a",
+        wing:"#a96820",
+        type:"waffle"
+    }
 
 ];
 
-let bestScore=Number(localStorage.getItem("skyBest")||0);
-let totalCoins=Number(localStorage.getItem("skyCoins")||0);
-let selectedSkin=Number(localStorage.getItem("skySkin")||0);
 
-if(!skins[selectedSkin] || bestScore<skins[selectedSkin].unlock){
-    selectedSkin=0;
+let bestScore =
+    Number(localStorage.getItem("skyBest") || 0);
+
+let totalCoins =
+    Number(localStorage.getItem("skyCoins") || 0);
+
+let selectedSkin =
+    Number(localStorage.getItem("skySkin") || 0);
+
+if(
+    !skins[selectedSkin] ||
+    bestScore < skins[selectedSkin].unlock
+){
+    selectedSkin = 0;
+}
+
+
+/* =========================
+   SALVAR
+========================= */
+
+function save(){
+
+    localStorage.setItem(
+        "skyBest",
+        bestScore
+    );
+
+    localStorage.setItem(
+        "skyCoins",
+        totalCoins
+    );
+
+    localStorage.setItem(
+        "skySkin",
+        selectedSkin
+    );
+
 }
 
 
@@ -291,83 +326,91 @@ if(!skins[selectedSkin] || bestScore<skins[selectedSkin].unlock){
 
 function createSkins(){
 
-    const box=document.getElementById("skins");
+    const box =
+        document.getElementById("skins");
 
-    box.innerHTML="";
+    box.innerHTML = "";
 
     skins.forEach((skin,index)=>{
 
-        const button=document.createElement("button");
+        const button =
+            document.createElement("button");
 
-        button.className="skin";
+        button.className = "skin";
 
-        const unlocked=bestScore>=skin.unlock;
+        const unlocked =
+            bestScore >= skin.unlock;
 
-        if(index===selectedSkin){
+        if(index === selectedSkin){
             button.classList.add("selected");
         }
 
         if(!unlocked){
             button.classList.add("locked");
-            button.textContent=
-                skin.name+" 🔒 "+skin.unlock;
         }
-        else{
 
-            button.textContent=
-                skin.name+
-                (skin.unlock>0 ? " ✓":"");
+        if(unlocked){
 
-            button.onclick=()=>{
+            button.textContent =
+                skin.name +
+                (skin.unlock > 0 ? " ✓" : "");
 
-                selectedSkin=index;
+            button.onclick = function(){
 
-                localStorage.setItem(
-                    "skySkin",
-                    selectedSkin
-                );
+                selectedSkin = index;
+
+                save();
 
                 createSkins();
-                draw();
 
             };
+
+        }else{
+
+            button.textContent =
+                skin.name +
+                " 🔒 " +
+                skin.unlock;
+
         }
 
         box.appendChild(button);
 
     });
 
-    document.getElementById("best").textContent=bestScore;
-    document.getElementById("totalCoins").textContent=totalCoins;
+    document.getElementById("best").textContent =
+        bestScore;
+
+    document.getElementById("totalCoins").textContent =
+        totalCoins;
+
 }
 
 createSkins();
 
 
 /* =========================
-   JOGO
+   OBJETOS
 ========================= */
 
-let bird={
-    x:0,
-    y:0,
-    velocity:0,
-    radius:28,
-    rotation:0
-};
+let bird;
 
-let fatalClouds=[];
-let coins=[];
-let particles=[];
+let normalClouds = [];
+let fatalClouds = [];
+let coins = [];
+let particles = [];
 
-let score=0;
-let runCoins=0;
-let playing=false;
-let lastTime=0;
-let gameTime=0;
+let score = 0;
+let runCoins = 0;
 
-let fatalTimer=2;
-let coinTimer=1;
+let playing = false;
+
+let lastTime = 0;
+let gameTime = 0;
+
+let cloudTimer = 0;
+let fatalTimer = 0;
+let coinTimer = 0;
 
 
 /* =========================
@@ -376,25 +419,40 @@ let coinTimer=1;
 
 function resetGame(){
 
-    bird.x=W*.25;
-    bird.y=H*.45;
-    bird.velocity=0;
-    bird.radius=Math.max(22,Math.min(W,H)*.055);
-    bird.rotation=0;
+    bird = {
 
-    fatalClouds=[];
-    coins=[];
-    particles=[];
+        x:W * .23,
 
-    score=0;
-    runCoins=0;
-    gameTime=0;
+        y:H * .45,
 
-    fatalTimer=1.5;
-    coinTimer=.7;
+        velocity:0,
 
-    document.getElementById("score").textContent="0";
-    document.getElementById("coins").textContent="0";
+        radius:
+            Math.max(
+                22,
+                Math.min(W,H) * .055
+            ),
+
+        rotation:0
+
+    };
+
+    normalClouds = [];
+    fatalClouds = [];
+    coins = [];
+    particles = [];
+
+    score = 0;
+    runCoins = 0;
+
+    gameTime = 0;
+
+    cloudTimer = .2;
+    fatalTimer = 2.5;
+    coinTimer = .8;
+
+    document.getElementById("score").textContent = "0";
+    document.getElementById("coins").textContent = "0";
 }
 
 
@@ -406,13 +464,15 @@ function startGame(){
 
     resetGame();
 
-    document.getElementById("menu").style.display="none";
-    document.getElementById("gameOver").style.display="none";
-    document.getElementById("score").style.display="block";
-    document.getElementById("coinHud").style.display="block";
+    document.getElementById("menu").style.display = "none";
+    document.getElementById("gameOver").style.display = "none";
 
-    playing=true;
-    lastTime=performance.now();
+    document.getElementById("score").style.display = "block";
+    document.getElementById("coinHud").style.display = "block";
+
+    playing = true;
+
+    lastTime = performance.now();
 
     requestAnimationFrame(gameLoop);
 }
@@ -424,42 +484,89 @@ function startGame(){
 
 function flap(){
 
-    if(!playing)return;
+    if(!playing) return;
 
-    bird.velocity=-390;
-    bird.rotation=-.5;
+    bird.velocity = -390;
+    bird.rotation = -0.5;
 }
 
-canvas.addEventListener("pointerdown",e=>{
+
+/* =========================
+   CONTROLES
+========================= */
+
+canvas.addEventListener("pointerdown",function(e){
+
     e.preventDefault();
     flap();
+
 });
 
-document.addEventListener("keydown",e=>{
+document.addEventListener("keydown",function(e){
 
-    if(e.code==="Space"||e.code==="ArrowUp"){
+    if(
+        e.code === "Space" ||
+        e.code === "ArrowUp"
+    ){
+
         e.preventDefault();
         flap();
+
     }
 
 });
 
-document.getElementById("start").onclick=startGame;
-document.getElementById("restart").onclick=startGame;
+document.getElementById("start").onclick =
+    startGame;
 
-document.getElementById("backMenu").onclick=()=>{
+document.getElementById("restart").onclick =
+    startGame;
 
-    playing=false;
+document.getElementById("backMenu").onclick =
+function(){
 
-    document.getElementById("gameOver").style.display="none";
-    document.getElementById("menu").style.display="flex";
-    document.getElementById("score").style.display="none";
-    document.getElementById("coinHud").style.display="none";
+    playing = false;
+
+    document.getElementById("gameOver").style.display =
+        "none";
+
+    document.getElementById("menu").style.display =
+        "flex";
 
     createSkins();
+
     resetGame();
+
     draw();
+
 };
+
+
+/* =========================
+   NUVEM NORMAL
+========================= */
+
+function createNormalCloud(){
+
+    normalClouds.push({
+
+        x:W + 100,
+
+        y:
+            70 +
+            Math.random() * (H * .60),
+
+        size:
+            25 +
+            Math.random() * 20,
+
+        speed:
+            45 +
+            Math.random() * 25
+
+    });
+
+}
 
 
 /* =========================
@@ -470,17 +577,24 @@ function createFatalCloud(){
 
     fatalClouds.push({
 
-        x:W+100,
+        x:W + 120,
 
-        y:70+Math.random()*(H*.65),
+        y:
+            70 +
+            Math.random() * (H * .60),
 
-        size:38+Math.random()*15,
+        size:
+            38 +
+            Math.random() * 12,
 
-        speed:95+Math.random()*45,
+        speed:
+            90 +
+            Math.random() * 30,
 
-        pulse:Math.random()*10
+        pulse:0
 
     });
+
 }
 
 
@@ -492,15 +606,19 @@ function createCoin(){
 
     coins.push({
 
-        x:W+40,
+        x:W + 50,
 
-        y:70+Math.random()*(H*.65),
+        y:
+            70 +
+            Math.random() * (H * .62),
 
         radius:15,
 
-        spin:Math.random()*6
+        spin:
+            Math.random() * Math.PI * 2
 
     });
+
 }
 
 
@@ -508,21 +626,29 @@ function createCoin(){
    PARTÍCULAS
 ========================= */
 
-function particlesAt(x,y,color){
+function particlesAt(x,y,amount,color){
 
-    for(let i=0;i<12;i++){
+    for(let i=0;i<amount;i++){
 
         particles.push({
 
             x:x,
             y:y,
-            vx:(Math.random()-.5)*180,
-            vy:(Math.random()-.5)*180,
+
+            vx:
+                (Math.random()-.5)*160,
+
+            vy:
+                (Math.random()-.5)*160,
+
             life:.5,
+
             color:color
 
         });
+
     }
+
 }
 
 
@@ -532,102 +658,141 @@ function particlesAt(x,y,color){
 
 function update(delta){
 
-    delta=Math.min(delta,.035);
+    delta = Math.min(delta,.035);
 
-    gameTime+=delta;
-
-    bird.velocity+=1150*delta;
-    bird.y+=bird.velocity*delta;
-
-    bird.rotation+=2*delta;
-
-    bird.rotation=Math.min(1,bird.rotation);
+    gameTime += delta;
 
 
-    fatalTimer-=delta;
-    coinTimer-=delta;
+    bird.velocity += 1150 * delta;
+    bird.y += bird.velocity * delta;
+
+    bird.rotation += 2 * delta;
+
+    if(bird.rotation > 1){
+        bird.rotation = 1;
+    }
 
 
-    if(fatalTimer<=0){
+    cloudTimer -= delta;
+    fatalTimer -= delta;
+    coinTimer -= delta;
+
+
+    if(cloudTimer <= 0){
+
+        createNormalCloud();
+
+        cloudTimer =
+            1.2 +
+            Math.random()*1.5;
+
+    }
+
+
+    if(fatalTimer <= 0){
 
         createFatalCloud();
 
-        fatalTimer=
-            1.8+
-            Math.random()*1.7;
+        fatalTimer =
+            2.2 +
+            Math.random()*1.8;
+
     }
 
 
-    if(coinTimer<=0){
+    if(coinTimer <= 0){
 
         createCoin();
 
-        coinTimer=
-            .7+
-            Math.random()*1.1;
+        coinTimer =
+            .8 +
+            Math.random()*1.2;
+
     }
 
 
-    const speed=
-        1+
-        Math.min(1.6,score/150);
+    const speed =
+        1 +
+        Math.min(
+            1.5,
+            score/100
+        );
+
+
+    for(const cloud of normalClouds){
+
+        cloud.x -=
+            cloud.speed *
+            delta *
+            speed;
+
+    }
 
 
     for(const cloud of fatalClouds){
 
-        cloud.x-=
-            cloud.speed*
-            delta*
+        cloud.x -=
+            cloud.speed *
+            delta *
             speed;
 
-        cloud.pulse+=delta*5;
+        cloud.pulse +=
+            delta*5;
 
     }
 
 
     for(const coin of coins){
 
-        coin.x-=
-            190*
-            delta*
+        coin.x -=
+            190 *
+            delta *
             speed;
 
-        coin.spin+=delta*7;
+        coin.spin +=
+            delta*7;
 
     }
 
 
-    /* MOEDAS */
+    /* PEGAR MOEDAS */
 
     for(let i=coins.length-1;i>=0;i--){
 
-        const coin=coins[i];
+        const coin = coins[i];
 
-        const d=Math.hypot(
-            bird.x-coin.x,
-            bird.y-coin.y
-        );
+        const distance =
+            Math.hypot(
+                bird.x-coin.x,
+                bird.y-coin.y
+            );
 
-        if(d<bird.radius+coin.radius){
+        if(
+            distance <
+            bird.radius+coin.radius
+        ){
 
             runCoins++;
 
-            document.getElementById("coins").textContent=runCoins;
+            document.getElementById("coins").textContent =
+                runCoins;
 
             particlesAt(
                 coin.x,
                 coin.y,
+                10,
                 "#ffe600"
             );
 
             coins.splice(i,1);
 
         }
-        else if(coin.x<-50){
+        else if(coin.x < -60){
 
             coins.splice(i,1);
 
         }
+
     }
 
 
@@ -635,68 +800,78 @@ function update(delta){
 
     for(const cloud of fatalClouds){
 
-        const d=Math.hypot(
-            bird.x-cloud.x,
-            bird.y-cloud.y
-        );
+        const distance =
+            Math.hypot(
+                bird.x-cloud.x,
+                bird.y-cloud.y
+            );
 
         if(
-            d<
-            bird.radius+
-            cloud.size*.75
+            distance <
+            bird.radius +
+            cloud.size*.72
         ){
 
             particlesAt(
                 bird.x,
                 bird.y,
+                20,
                 "#ff3333"
             );
 
             endGame();
+
             return;
+
         }
 
     }
 
 
-    fatalClouds=
+    normalClouds =
+        normalClouds.filter(
+            cloud => cloud.x > -150
+        );
+
+    fatalClouds =
         fatalClouds.filter(
-            c=>c.x>-150
+            cloud => cloud.x > -150
         );
 
 
-    /* PARTÍCULAS */
-
     for(let i=particles.length-1;i>=0;i--){
 
-        const p=particles[i];
+        const p = particles[i];
 
-        p.x+=p.vx*delta;
-        p.y+=p.vy*delta;
-        p.life-=delta;
+        p.x += p.vx*delta;
+        p.y += p.vy*delta;
+        p.life -= delta;
 
-        if(p.life<=0){
+        if(p.life <= 0){
             particles.splice(i,1);
         }
 
     }
 
 
-    /* CHÃO E TETO */
-
     if(
-        bird.y-bird.radius<0 ||
-        bird.y+bird.radius>H-45
+        bird.y-bird.radius < 0 ||
+        bird.y+bird.radius > H-45
     ){
 
         endGame();
+
         return;
+
     }
 
 
-    score=Math.floor(gameTime*5);
+    score =
+        Math.floor(gameTime*5);
 
-    document.getElementById("score").textContent=score;
+    document.getElementById("score").textContent =
+        score;
+
 }
 
 
@@ -706,25 +881,38 @@ function update(delta){
 
 function drawBackground(){
 
-    const g=ctx.createLinearGradient(0,0,0,H);
+    const gradient =
+        ctx.createLinearGradient(
+            0,0,0,H
+        );
 
-    g.addColorStop(0,"#58c8e8");
-    g.addColorStop(1,"#b9f2ff");
+    gradient.addColorStop(
+        0,
+        "#58c8e8"
+    );
 
-    ctx.fillStyle=g;
-    ctx.fillRect(0,0,W,H);
+    gradient.addColorStop(
+        1,
+        "#b9f2ff"
+    );
+
+    ctx.fillStyle = gradient;
+
+    ctx.fillRect(
+        0,0,W,H
+    );
 
 
     /* SOL */
 
-    ctx.fillStyle="#ffe36b";
+    ctx.fillStyle = "#ffe36b";
 
     ctx.beginPath();
 
     ctx.arc(
         W*.82,
-        H*.15,
-        40,
+        H*.16,
+        38,
         0,
         Math.PI*2
     );
@@ -734,11 +922,72 @@ function drawBackground(){
 
     /* CHÃO */
 
-    ctx.fillStyle="#79c94a";
-    ctx.fillRect(0,H-45,W,45);
+    ctx.fillStyle = "#79c94a";
 
-    ctx.fillStyle="#5da538";
-    ctx.fillRect(0,H-45,W,6);
+    ctx.fillRect(
+        0,
+        H-45,
+        W,
+        45
+    );
+
+}
+
+
+/* =========================
+   NUVEM NORMAL
+========================= */
+
+function drawNormalCloud(cloud){
+
+    ctx.save();
+
+    ctx.translate(
+        cloud.x,
+        cloud.y
+    );
+
+    ctx.fillStyle =
+        "rgba(255,255,255,.9)";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        -40,
+        8,
+        cloud.size*.65,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        -10,
+        -10,
+        cloud.size*.9,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        25,
+        4,
+        cloud.size*.75,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        48,
+        12,
+        cloud.size*.5,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+    ctx.restore();
+
 }
 
 
@@ -752,53 +1001,100 @@ function drawFatalCloud(cloud){
 
     ctx.translate(
         cloud.x,
-        cloud.y+
+        cloud.y +
         Math.sin(cloud.pulse)*3
     );
 
-    ctx.shadowColor="#ff2222";
-    ctx.shadowBlur=16;
+    ctx.shadowColor = "#ff3030";
+    ctx.shadowBlur = 15;
 
-    ctx.fillStyle="#555563";
-    ctx.strokeStyle="#292933";
-    ctx.lineWidth=5;
+    ctx.fillStyle = "#5a5a66";
+    ctx.strokeStyle = "#292933";
+    ctx.lineWidth = 5;
 
     ctx.beginPath();
 
-    ctx.arc(-40,8,cloud.size*.65,0,Math.PI*2);
-    ctx.arc(-10,-10,cloud.size*.9,0,Math.PI*2);
-    ctx.arc(25,4,cloud.size*.75,0,Math.PI*2);
-    ctx.arc(48,12,cloud.size*.5,0,Math.PI*2);
+    ctx.arc(
+        -40,
+        8,
+        cloud.size*.65,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        -10,
+        -10,
+        cloud.size*.9,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        25,
+        4,
+        cloud.size*.75,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        48,
+        12,
+        cloud.size*.5,
+        0,
+        Math.PI*2
+    );
 
     ctx.fill();
     ctx.stroke();
 
-    ctx.shadowBlur=0;
+    ctx.shadowBlur = 0;
+
 
     /* OLHOS */
 
-    ctx.fillStyle="#ff3333";
+    ctx.fillStyle = "#ff3333";
 
     ctx.beginPath();
 
-    ctx.arc(-17,2,6,0,Math.PI*2);
-    ctx.arc(23,2,6,0,Math.PI*2);
+    ctx.arc(
+        -17,
+        2,
+        6,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        23,
+        2,
+        6,
+        0,
+        Math.PI*2
+    );
 
     ctx.fill();
 
+
     /* BOCA */
 
-    ctx.strokeStyle="#ff3333";
-    ctx.lineWidth=4;
+    ctx.strokeStyle = "#ff3333";
+    ctx.lineWidth = 4;
 
     ctx.beginPath();
 
     ctx.moveTo(-22,22);
-    ctx.quadraticCurveTo(2,37,27,21);
+
+    ctx.quadraticCurveTo(
+        2,37,
+        27,21
+    );
 
     ctx.stroke();
 
     ctx.restore();
+
 }
 
 
@@ -810,31 +1106,47 @@ function drawCoin(coin){
 
     ctx.save();
 
-    ctx.translate(coin.x,coin.y);
-
-    const s=Math.max(
-        .25,
-        Math.abs(Math.cos(coin.spin))
+    ctx.translate(
+        coin.x,
+        coin.y
     );
 
-    ctx.scale(s,1);
+    const scale =
+        Math.abs(
+            Math.cos(coin.spin)
+        );
 
-    ctx.fillStyle="#ffd21f";
-    ctx.strokeStyle="#b57b00";
-    ctx.lineWidth=3;
+    ctx.scale(
+        Math.max(.25,scale),
+        1
+    );
+
+    ctx.fillStyle = "#ffd21f";
+    ctx.strokeStyle = "#b57b00";
+    ctx.lineWidth = 3;
 
     ctx.beginPath();
-    ctx.arc(0,0,coin.radius,0,Math.PI*2);
+
+    ctx.arc(
+        0,0,
+        coin.radius,
+        0,
+        Math.PI*2
+    );
+
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle="#fff3a0";
-    ctx.font="bold 15px Arial";
-    ctx.textAlign="center";
-    ctx.textBaseline="middle";
-    ctx.fillText("★",0,1);
+    ctx.fillStyle = "#fff3a0";
+
+    ctx.font = "bold 15px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.fillText("$",0,1);
 
     ctx.restore();
+
 }
 
 
@@ -844,37 +1156,97 @@ function drawCoin(coin){
 
 function drawBird(){
 
-    const skin=skins[selectedSkin];
-    const r=bird.radius;
+    const skin =
+        skins[selectedSkin];
+
+    const r =
+        bird.radius;
+
 
     ctx.save();
 
-    ctx.translate(bird.x,bird.y);
-    ctx.rotate(bird.rotation);
+    ctx.translate(
+        bird.x,
+        bird.y
+    );
+
+    ctx.rotate(
+        bird.rotation
+    );
+
+
+    /* FÊNIX */
+
+    if(skin.type === "phoenix"){
+
+        ctx.fillStyle = "#ff7a00";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -r*.3,
+            r*.3
+        );
+
+        ctx.lineTo(
+            -r*1.8,
+            r*1.3
+        );
+
+        ctx.lineTo(
+            -r*1.1,
+            0
+        );
+
+        ctx.lineTo(
+            -r*1.8,
+            -r
+        );
+
+        ctx.lineTo(
+            -r*.3,
+            -r*.2
+        );
+
+        ctx.fill();
+
+    }
+
 
     /* SOMBRIO */
 
-    if(skin.head==="dark"){
+    if(skin.type === "dark"){
 
-        ctx.shadowColor="#9a55ff";
-        ctx.shadowBlur=20;
+        ctx.shadowColor = "#8b55ff";
+        ctx.shadowBlur = 18;
+
     }
 
 
     /* CORPO */
 
-    ctx.fillStyle=skin.body;
+    ctx.fillStyle =
+        skin.body;
 
     ctx.beginPath();
-    ctx.arc(0,0,r,0,Math.PI*2);
+
+    ctx.arc(
+        0,
+        0,
+        r,
+        0,
+        Math.PI*2
+    );
+
     ctx.fill();
 
-    ctx.shadowBlur=0;
+    ctx.shadowBlur = 0;
 
 
     /* ASA */
 
-    ctx.fillStyle=skin.wing;
+    ctx.fillStyle =
+        skin.wing;
 
     ctx.beginPath();
 
@@ -891,159 +1263,40 @@ function drawBird(){
     ctx.fill();
 
 
-    /* =================
-       ROSQUINHA
-    ================= */
+    /* HERÓI */
 
-    if(skin.head==="donut"){
+    if(skin.type === "hero"){
 
-        ctx.fillStyle="#d88b45";
-
-        ctx.beginPath();
-        ctx.arc(0,-r*.9,r*.58,0,Math.PI*2);
-        ctx.fill();
-
-        ctx.fillStyle="#ff9fc4";
-
-        ctx.beginPath();
-        ctx.arc(0,-r*.9,r*.46,0,Math.PI*2);
-        ctx.fill();
-
-        ctx.fillStyle="#ffcf91";
-
-        ctx.beginPath();
-        ctx.arc(0,-r*.9,r*.17,0,Math.PI*2);
-        ctx.fill();
-
-        /* granulado */
-
-        ctx.fillStyle="#7b42ff";
-
-        for(let i=0;i<6;i++){
-
-            const a=i*Math.PI/3;
-
-            ctx.fillRect(
-                Math.cos(a)*r*.38-2,
-                -r*.9+Math.sin(a)*r*.38-2,
-                4,
-                4
-            );
-        }
-    }
-
-
-    /* =================
-       WAFFLE
-    ================= */
-
-    if(skin.head==="waffle"){
-
-        ctx.save();
-
-        ctx.translate(0,-r*.95);
-        ctx.rotate(-.08);
-
-        ctx.fillStyle="#e7ad42";
-        ctx.strokeStyle="#9b681d";
-        ctx.lineWidth=3;
+        ctx.fillStyle = "#e21b23";
 
         ctx.beginPath();
 
-        ctx.roundRect(
-            -r*.65,
-            -r*.45,
-            r*1.3,
-            r*.9,
-            8
+        ctx.moveTo(
+            -r*.2,
+            r*.2
+        );
+
+        ctx.lineTo(
+            -r*1.7,
+            r*1.2
+        );
+
+        ctx.lineTo(
+            -r,
+            0
         );
 
         ctx.fill();
-        ctx.stroke();
 
-        ctx.strokeStyle="#b77c25";
-        ctx.lineWidth=3;
-
-        for(let i=-2;i<=2;i++){
-
-            ctx.beginPath();
-
-            ctx.moveTo(
-                -r*.5+i*r*.25,
-                -r*.4
-            );
-
-            ctx.lineTo(
-                -r*.1+i*r*.25,
-                r*.4
-            );
-
-            ctx.stroke();
-
-        }
-
-        for(let i=-2;i<=2;i++){
-
-            ctx.beginPath();
-
-            ctx.moveTo(
-                -r*.6,
-                i*r*.2
-            );
-
-            ctx.lineTo(
-                r*.6,
-                i*r*.2
-            );
-
-            ctx.stroke();
-
-        }
-
-        ctx.restore();
-    }
-
-
-    /* HERÓI */
-
-    if(skin.head==="hero"){
-
-        ctx.fillStyle="#e21b23";
-
-        ctx.beginPath();
-
-        ctx.moveTo(-r*.2,r*.2);
-        ctx.lineTo(-r*1.6,r*1.2);
-        ctx.lineTo(-r,0);
-
-        ctx.fill();
-    }
-
-
-    /* FÊNIX */
-
-    if(skin.head==="fire"){
-
-        ctx.fillStyle="#ff9d00";
-
-        ctx.beginPath();
-
-        ctx.moveTo(-r*.5,-r*.4);
-        ctx.lineTo(-r*1.3,-r*1.5);
-        ctx.lineTo(-r*.3,-r*.9);
-        ctx.lineTo(0,-r*1.6);
-        ctx.lineTo(r*.2,-r*.5);
-
-        ctx.fill();
     }
 
 
     /* ROBÔ */
 
-    if(skin.head==="robot"){
+    if(skin.type === "robot"){
 
-        ctx.strokeStyle="#333";
-        ctx.lineWidth=3;
+        ctx.strokeStyle = "#333";
+        ctx.lineWidth = 3;
 
         ctx.strokeRect(
             -r*.65,
@@ -1052,19 +1305,28 @@ function drawBird(){
             r*1.3
         );
 
-        ctx.fillStyle="#ff3333";
+        ctx.fillStyle = "#ff3333";
 
         ctx.beginPath();
-        ctx.arc(r*.35,-r*.2,r*.12,0,Math.PI*2);
+
+        ctx.arc(
+            r*.35,
+            -r*.2,
+            r*.12,
+            0,
+            Math.PI*2
+        );
+
         ctx.fill();
+
     }
 
 
     /* ALIEN */
 
-    if(skin.head==="alien"){
+    if(skin.type === "alien"){
 
-        ctx.fillStyle="#111";
+        ctx.fillStyle = "#111";
 
         ctx.beginPath();
 
@@ -1079,12 +1341,144 @@ function drawBird(){
         );
 
         ctx.fill();
+
+    }
+
+
+    /* =====================
+       ROSQUINHA NA CABEÇA
+    ===================== */
+
+    if(skin.type === "donut"){
+
+        const dy = -r*1.05;
+
+        ctx.fillStyle = "#d9894d";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            dy,
+            r*.72,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+        ctx.fillStyle = "#f4b27a";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            dy,
+            r*.38,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+        /* cobertura */
+
+        ctx.fillStyle = "#ff72a8";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            dy,
+            r*.58,
+            Math.PI,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+        /* granulado */
+
+        ctx.fillStyle = "#ffe600";
+
+        for(let i=0;i<5;i++){
+
+            ctx.fillRect(
+                -r*.4+i*r*.2,
+                dy-r*.15,
+                4,
+                2
+            );
+
+        }
+
+    }
+
+
+    /* =====================
+       WAFFLE NA CABEÇA
+    ===================== */
+
+    if(skin.type === "waffle"){
+
+        const wy = -r*1.05;
+
+        ctx.fillStyle = "#d99a3a";
+
+        ctx.fillRect(
+            -r*.72,
+            wy-r*.55,
+            r*1.44,
+            r*1.1
+        );
+
+        ctx.strokeStyle = "#8f571c";
+        ctx.lineWidth = 3;
+
+        /* quadradinhos */
+
+        for(let i=-2;i<=2;i++){
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                -r*.65+i*r*.3,
+                wy-r*.5
+            );
+
+            ctx.lineTo(
+                -r*.65+i*r*.3,
+                wy+r*.5
+            );
+
+            ctx.stroke();
+
+        }
+
+        for(let i=-1;i<=2;i++){
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                -r*.7,
+                wy-r*.55+i*r*.3
+            );
+
+            ctx.lineTo(
+                r*.7,
+                wy-r*.55+i*r*.3
+            );
+
+            ctx.stroke();
+
+        }
+
     }
 
 
     /* OLHO */
 
-    ctx.fillStyle="white";
+    ctx.fillStyle = "white";
 
     ctx.beginPath();
 
@@ -1098,7 +1492,7 @@ function drawBird(){
 
     ctx.fill();
 
-    ctx.fillStyle="#111";
+    ctx.fillStyle = "#111";
 
     ctx.beginPath();
 
@@ -1115,18 +1509,31 @@ function drawBird(){
 
     /* BICO */
 
-    ctx.fillStyle="#ff8c00";
+    ctx.fillStyle = "#ff8c00";
 
     ctx.beginPath();
 
-    ctx.moveTo(r*.75,0);
-    ctx.lineTo(r*1.55,r*.2);
-    ctx.lineTo(r*.75,r*.4);
+    ctx.moveTo(
+        r*.75,
+        0
+    );
+
+    ctx.lineTo(
+        r*1.55,
+        r*.2
+    );
+
+    ctx.lineTo(
+        r*.75,
+        r*.4
+    );
 
     ctx.closePath();
+
     ctx.fill();
 
     ctx.restore();
+
 }
 
 
@@ -1138,6 +1545,10 @@ function draw(){
 
     drawBackground();
 
+    for(const cloud of normalClouds){
+        drawNormalCloud(cloud);
+    }
+
     for(const cloud of fatalClouds){
         drawFatalCloud(cloud);
     }
@@ -1148,8 +1559,10 @@ function draw(){
 
     for(const p of particles){
 
-        ctx.globalAlpha=Math.max(0,p.life*2);
-        ctx.fillStyle=p.color;
+        ctx.globalAlpha =
+            Math.max(0,p.life*2);
+
+        ctx.fillStyle = p.color;
 
         ctx.fillRect(
             p.x,
@@ -1157,11 +1570,15 @@ function draw(){
             5,
             5
         );
+
     }
 
-    ctx.globalAlpha=1;
+    ctx.globalAlpha = 1;
 
-    drawBird();
+    if(bird){
+        drawBird();
+    }
+
 }
 
 
@@ -1171,19 +1588,25 @@ function draw(){
 
 function gameLoop(now){
 
-    if(!playing)return;
+    if(!playing) return;
 
-    const delta=
+    const delta =
         (now-lastTime)/1000;
 
-    lastTime=now;
+    lastTime = now;
 
     update(delta);
+
     draw();
 
     if(playing){
-        requestAnimationFrame(gameLoop);
+
+        requestAnimationFrame(
+            gameLoop
+        );
+
     }
+
 }
 
 
@@ -1193,40 +1616,46 @@ function gameLoop(now){
 
 function endGame(){
 
-    if(!playing)return;
+    if(!playing) return;
 
-    playing=false;
+    playing = false;
 
-    if(score>bestScore){
-        bestScore=score;
+
+    if(score > bestScore){
+        bestScore = score;
     }
 
-    totalCoins+=runCoins;
+    totalCoins += runCoins;
 
-    localStorage.setItem(
-        "skyBest",
-        bestScore
-    );
+    save();
 
-    localStorage.setItem(
-        "skyCoins",
-        totalCoins
-    );
 
-    document.getElementById("finalScore").textContent=score;
-    document.getElementById("finalBest").textContent=bestScore;
-    document.getElementById("finalCoins").textContent=runCoins;
+    document.getElementById("finalScore").textContent =
+        score;
 
-    document.getElementById("score").style.display="none";
-    document.getElementById("coinHud").style.display="none";
-    document.getElementById("gameOver").style.display="flex";
+    document.getElementById("finalBest").textContent =
+        bestScore;
+
+    document.getElementById("finalCoins").textContent =
+        runCoins;
+
+
+    document.getElementById("score").style.display =
+        "none";
+
+    document.getElementById("coinHud").style.display =
+        "none";
+
+    document.getElementById("gameOver").style.display =
+        "flex";
 
     createSkins();
+
 }
 
 
 /* =========================
-   INÍCIO
+   INICIAL
 ========================= */
 
 resetGame();
