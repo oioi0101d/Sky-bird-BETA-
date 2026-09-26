@@ -217,8 +217,6 @@ const skins=[
   type:"waffle"
  },
 
- /* NOVAS SKINS */
-
  {
   name:"🎅 Natal",
   price:200,
@@ -241,6 +239,16 @@ const skins=[
   body:"#ffd21f",
   wing:"#d49b00",
   type:"newyear"
+ },
+
+ /* NOVA SKIN SONIC */
+
+ {
+  name:"🦔 Sonic",
+  price:1000,
+  body:"#168cff",
+  wing:"#075dcc",
+  type:"sonic"
  }
 
 ];
@@ -268,6 +276,7 @@ function save(){
  localStorage.setItem("skyBest",bestScore);
  localStorage.setItem("skyCoins",totalCoins);
  localStorage.setItem("skySkin",selectedSkin);
+
  localStorage.setItem(
   "skyBought",
   JSON.stringify(boughtSkins)
@@ -761,7 +770,7 @@ function update(delta){
 
 
 /* =========================
-FUNDO
+FUNDO 🌌
 ========================= */
 
 function drawBackground(){
@@ -770,20 +779,108 @@ function drawBackground(){
   0,0,0,H
  );
 
- gradient.addColorStop(0,"#58c8e8");
- gradient.addColorStop(1,"#b9f2ff");
+ gradient.addColorStop(0,"#05051c");
+ gradient.addColorStop(.5,"#10104a");
+ gradient.addColorStop(1,"#24245f");
 
  ctx.fillStyle=gradient;
  ctx.fillRect(0,0,W,H);
 
- ctx.fillStyle="#ffe36b";
+
+ /* ESTRELAS */
+
+ ctx.fillStyle="white";
+
+ const stars=[
+  [0.05,0.12,2],
+  [0.12,0.25,1.5],
+  [0.19,0.08,2],
+  [0.27,0.18,1.5],
+  [0.34,0.07,2],
+  [0.41,0.28,1.5],
+  [0.49,0.13,2],
+  [0.56,0.22,1.5],
+  [0.64,0.08,2],
+  [0.71,0.3,1.5],
+  [0.78,0.14,2],
+  [0.86,0.24,1.5],
+  [0.93,0.09,2],
+  [0.97,0.32,1.5],
+  [0.08,0.42,1.5],
+  [0.22,0.36,2],
+  [0.38,0.43,1.5],
+  [0.52,0.38,2],
+  [0.68,0.45,1.5],
+  [0.82,0.39,2],
+  [0.91,0.48,1.5]
+ ];
+
+ for(const star of stars){
+
+  ctx.beginPath();
+
+  ctx.arc(
+   W*star[0],
+   H*star[1],
+   star[2],
+   0,
+   Math.PI*2
+  );
+
+  ctx.fill();
+
+ }
+
+
+ /* LUA */
+
+ ctx.fillStyle="#fff4c2";
 
  ctx.beginPath();
- ctx.arc(W*.82,H*.16,38,0,Math.PI*2);
+
+ ctx.arc(
+  W*.82,
+  H*.16,
+  42,
+  0,
+  Math.PI*2
+ );
+
  ctx.fill();
 
- ctx.fillStyle="#79c94a";
- ctx.fillRect(0,H-45,W,45);
+
+ /* CRATERAS */
+
+ ctx.fillStyle="rgba(180,170,130,.35)";
+
+ ctx.beginPath();
+
+ ctx.arc(W*.80,H*.14,7,0,Math.PI*2);
+ ctx.arc(W*.85,H*.19,5,0,Math.PI*2);
+ ctx.arc(W*.79,H*.21,4,0,Math.PI*2);
+
+ ctx.fill();
+
+
+ /* CHÃO */
+
+ ctx.fillStyle="#15152b";
+
+ ctx.fillRect(
+  0,
+  H-45,
+  W,
+  45
+ );
+
+ ctx.fillStyle="#29294d";
+
+ ctx.fillRect(
+  0,
+  H-45,
+  W,
+  5
+ );
 
 }
 
@@ -1145,13 +1242,9 @@ function drawBird(){
  }
 
 
- /* =========================
- SKIN NATAL
- ========================= */
+ /* NATAL */
 
  if(skin.type==="christmas"){
-
-  /* GORRO */
 
   ctx.fillStyle="#e3262e";
 
@@ -1200,13 +1293,9 @@ function drawBird(){
  }
 
 
- /* =========================
- HALLOWEEN
- ========================= */
+ /* HALLOWEEN */
 
  if(skin.type==="halloween"){
-
-  /* CHAPÉU */
 
   ctx.fillStyle="#292333";
 
@@ -1238,8 +1327,6 @@ function drawBird(){
    r*.18
   );
 
-  /* OLHOS DE ABÓBORA */
-
   ctx.fillStyle="#ffe600";
 
   ctx.beginPath();
@@ -1265,13 +1352,9 @@ function drawBird(){
  }
 
 
- /* =========================
- ANO NOVO
- ========================= */
+ /* ANO NOVO */
 
  if(skin.type==="newyear"){
-
-  /* CHAPÉU DE FESTA */
 
   ctx.fillStyle="#7b4dff";
 
@@ -1296,8 +1379,6 @@ function drawBird(){
 
   ctx.fill();
 
-  /* BOLINHAS */
-
   ctx.fillStyle="#ff3333";
 
   ctx.beginPath();
@@ -1319,6 +1400,82 @@ function drawBird(){
   );
 
   ctx.fill();
+
+ }
+
+
+ /* SONIC 🦔 */
+
+ if(skin.type==="sonic"){
+
+  /* ESPINHOS */
+
+  ctx.fillStyle="#075dcc";
+
+  ctx.beginPath();
+
+  ctx.moveTo(-r*.35,-r*.45);
+
+  ctx.lineTo(-r*1.45,-r*1.2);
+  ctx.lineTo(-r*.7,-r*.85);
+
+  ctx.lineTo(-r*1.55,-r*.55);
+  ctx.lineTo(-r*.7,-r*.25);
+
+  ctx.lineTo(-r*1.35,r*.25);
+  ctx.lineTo(-r*.25,r*.05);
+
+  ctx.closePath();
+
+  ctx.fill();
+
+
+  /* BARRIGA */
+
+  ctx.fillStyle="#f2c27b";
+
+  ctx.beginPath();
+
+  ctx.arc(
+   -r*.05,
+   r*.22,
+   r*.58,
+   0,
+   Math.PI*2
+  );
+
+  ctx.fill();
+
+
+  /* SAPATO */
+
+  ctx.fillStyle="#e3262e";
+
+  ctx.beginPath();
+
+  ctx.ellipse(
+   r*.35,
+   r*.82,
+   r*.58,
+   r*.23,
+   0,
+   0,
+   Math.PI*2
+  );
+
+  ctx.fill();
+
+
+  /* FAIXA BRANCA */
+
+  ctx.fillStyle="white";
+
+  ctx.fillRect(
+   r*.02,
+   r*.69,
+   r*.65,
+   r*.12
+  );
 
  }
 
